@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class UserController {
     int id = 0;
     private final HashMap<Integer, User> users = new HashMap<>();
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping
     public Collection<User> getAllUsers() {
