@@ -8,9 +8,11 @@
 *.tar.gz
 *.rar
 *.xml
+*.yml
 hs_err_pid*
 out/
 HELP.md
+README.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
