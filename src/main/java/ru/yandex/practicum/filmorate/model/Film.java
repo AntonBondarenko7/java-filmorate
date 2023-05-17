@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 
 @Data
@@ -18,6 +19,7 @@ public class Film {
     private Integer id;
     private final String name;
     private final String description;
+    private final Set<Long> likes;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
@@ -30,12 +32,14 @@ public class Film {
                 @JsonProperty("name") String name,
                 @JsonProperty("description") String description,
                 @JsonProperty("releaseDate") LocalDate releaseDate,
-                @JsonProperty("duration") int duration) {
+                @JsonProperty("duration") int duration,
+                @JsonProperty("likes") Set<Long> likes) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.likes = likes;
     }
 
 }
