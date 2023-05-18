@@ -9,13 +9,12 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 public interface FilmStorage {
-    public Film createFilm(Film film) throws ValidationException;
-    public Film updateFilm(Film film) throws ValidationException, ExistenceException;
-    public Collection<Film> getAllFilmsValues();
-    public int generateId();
-    public HashMap<Integer, Film> getAllFilms();
-    public int getFilmLikesCount(Film film);
-    public TreeSet<Film> getMostPopularFilms();
-
-    public Film getFilmById(int filmId) throws ValidationException, ExistenceException;
+    Film createFilm(Film film) throws ValidationException;
+    Film updateFilm(Film film) throws ValidationException, ExistenceException;
+    Collection<Film> getAllFilmsValues();
+    int generateId();
+    HashMap<Integer, Film> getAllFilms();
+    int getFilmLikesCount(Film film);
+    TreeSet<Film> getMostPopularFilms();
+    Film getFilmById(int filmId) throws ValidationException, ExistenceException;
 }

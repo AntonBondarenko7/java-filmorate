@@ -20,8 +20,7 @@ public class Film {
     private Integer id;
     private final String name;
     private final String description;
-    private final Set<Integer> likes = new HashSet<>(); {
-    };
+    private final Set<Integer> likes = new HashSet<>();
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
