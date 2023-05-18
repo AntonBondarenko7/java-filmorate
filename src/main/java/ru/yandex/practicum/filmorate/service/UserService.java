@@ -10,9 +10,11 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
 @Service
 public class UserService {
     private final UserStorage userStorage;
+
     @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
