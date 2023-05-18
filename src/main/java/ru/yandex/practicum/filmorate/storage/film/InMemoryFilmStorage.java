@@ -59,6 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public HashMap<Integer, Film> getAllFilms() {
         return films;
     }
+
     @Override
     public TreeSet<Film> getMostPopularFilms() {
         return mostPopularFilms;
