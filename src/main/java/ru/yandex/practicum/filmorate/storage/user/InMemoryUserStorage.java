@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -27,7 +29,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) throws ValidationException {
+    public User updateUser(User user) throws ValidationException, ExistenceException {
         if (users.containsKey(user.getId())) {
             try {
                 UserValidator.validateUser(user);
@@ -38,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
             }
         } else {
             String errorMessage = "Пользователя с таким идентификатором нет в списке";
-            throw new ValidationException(errorMessage);
+            throw new ExistenceException(errorMessage);
         }
     }
 
@@ -56,5 +58,15 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public HashMap<Integer, User> getAllUsers() {
         return users;
+    }
+
+    @Override
+    public User getUserById(int userId) throws ExistenceException {
+        if (users.containsKey(userId)) {
+            return users.get(userId);
+        } else {
+            String errorMessage = "Пользователя с таким идентификатором нет в списке";
+            throw new ExistenceException(errorMessage);
+        }
     }
 }

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Data
@@ -22,6 +24,7 @@ public class User {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate birthday;
+    private final Set<Integer> friends = new HashSet<>();
 
     @JsonCreator
     public User(@JsonProperty("id") int id,

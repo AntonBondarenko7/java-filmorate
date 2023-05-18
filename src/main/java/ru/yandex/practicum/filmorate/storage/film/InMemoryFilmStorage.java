@@ -1,17 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmComparator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
-
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.TreeSet;
 
 @Component
@@ -36,7 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) throws ValidationException {
+    public Film updateFilm(Film film) throws ValidationException, ExistenceException {
         if (films.containsKey(film.getId())) {
             try {
                 FilmValidator.validateFilm(film);
@@ -49,7 +46,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             }
         } else {
             String errorMessage = "Фильма с таким идентификатором нет в списке";
-            throw new ValidationException(errorMessage);
+            throw new ExistenceException(errorMessage);
         }
     }
 
@@ -76,5 +73,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public int getFilmLikesCount(Film film) {
         return film.getLikes().toArray().length;
+    }
+
+    @Override
+    public Film getFilmById(int filmId) throws ExistenceException {
+        if (films.containsKey(filmId)) {
+            return films.get(filmId);
+        } else {
+            String errorMessage = "Фильма с таким идентификатором нет в списке";
+            throw new ExistenceException(errorMessage);
+        }
     }
 }
