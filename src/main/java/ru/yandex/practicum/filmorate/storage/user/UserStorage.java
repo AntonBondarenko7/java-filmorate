@@ -8,9 +8,14 @@ import java.util.HashMap;
 
 public interface UserStorage {
     User createUser(User user) throws ValidationException;
+
     User updateUser(User user) throws ValidationException, ExistenceException;
+
     Collection<User> getAllUsersValues();
+
     int generateId();
+
     HashMap<Integer, User> getAllUsers();
+
     User getUserById(int userId) throws ValidationException, ExistenceException;
 }

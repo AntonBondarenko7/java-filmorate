@@ -10,11 +10,18 @@ import java.util.TreeSet;
 
 public interface FilmStorage {
     Film createFilm(Film film) throws ValidationException;
+
     Film updateFilm(Film film) throws ValidationException, ExistenceException;
+
     Collection<Film> getAllFilmsValues();
+
     int generateId();
+
     HashMap<Integer, Film> getAllFilms();
+
     int getFilmLikesCount(Film film);
+
     TreeSet<Film> getMostPopularFilms();
+
     Film getFilmById(int filmId) throws ValidationException, ExistenceException;
 }
