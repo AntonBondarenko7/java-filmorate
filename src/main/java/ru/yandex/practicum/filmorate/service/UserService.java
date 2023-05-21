@@ -1,24 +1,20 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     public void addFriend(int id, int friendId) throws ValidationException, ExistenceException {
         User user = userStorage.getUserById(id);
@@ -44,10 +40,9 @@ public class UserService {
         User friend = userStorage.getUserById(friendId);
         Set<Integer> userFriends = new HashSet<>(user.getFriends());
         Set<Integer> friendFriends = new HashSet<>(friend.getFriends());
+        userFriends.retainAll(friendFriends);
         for (Integer i : userFriends) {
-            if (friendFriends.contains(i)) {
-                commonFriends.add(userStorage.getUserById(i));
-            }
+            commonFriends.add(userStorage.getUserById(i));
         }
         return commonFriends;
     }
@@ -58,5 +53,21 @@ public class UserService {
             friends.add(userStorage.getUserById(id));
         }
         return friends;
+    }
+
+    public User createUser(User user) throws ValidationException {
+        return userStorage.createUser(user);
+    }
+
+    public User updateUser(User user) throws ValidationException, ExistenceException {
+        return userStorage.updateUser(user);
+    }
+
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers().values();
+    }
+
+    public User getUserById(int userId) throws ValidationException, ExistenceException {
+        return userStorage.getUserById(userId);
     }
 }

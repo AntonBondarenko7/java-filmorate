@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmComparator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -48,11 +47,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             String errorMessage = "Фильма с таким идентификатором нет в списке";
             throw new ExistenceException(errorMessage);
         }
-    }
-
-    @Override
-    public Collection<Film> getAllFilmsValues() {
-        return films.values();
     }
 
     @Override

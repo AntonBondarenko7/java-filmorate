@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
-import java.util.Collection;
 import java.util.HashMap;
 
 @Component
@@ -42,10 +41,6 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    @Override
-    public Collection<User> getAllUsersValues() {
-        return users.values();
-    }
 
     @Override
     public int generateId() {

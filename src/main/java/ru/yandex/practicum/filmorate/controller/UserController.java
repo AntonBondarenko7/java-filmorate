@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,31 +9,22 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import java.util.Collection;
-import java.util.Map;
 
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-public class UserController {
-    private final InMemoryUserStorage userStorage;
+public class UserController extends AdviceController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(InMemoryUserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
-        this.userService = userService;
-    }
 
     @GetMapping
     public Collection<User> getAllUsers() {
-        return userStorage.getAllUsersValues();
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable int id) throws ExistenceException {
-        return new ResponseEntity<>(userStorage.getUserById(id), HttpStatus.OK);
+    public ResponseEntity<?> getUserById(@PathVariable int id) throws ExistenceException, ValidationException {
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/friends")
@@ -49,13 +40,13 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) throws ValidationException {
-        userStorage.createUser(user);
+        userService.createUser(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user) throws ValidationException, ExistenceException {
-        userStorage.updateUser(user);
+        userService.updateUser(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -71,15 +62,5 @@ public class UserController {
                                           @PathVariable int friendId) throws ValidationException, ExistenceException {
         userService.removeFriend(id, friendId);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleValidationException(final ValidationException e) {
-        return new ResponseEntity<>(Map.of("Ошибка валидации", e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleExistenceException(final ExistenceException e) {
-        return new ResponseEntity<>(Map.of("На найден идентификатор", e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }
