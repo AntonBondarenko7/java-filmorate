@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.validator;
 
 
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.util.StringUtils;
 

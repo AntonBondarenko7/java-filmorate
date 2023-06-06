@@ -11,11 +11,9 @@
 *.yml
 checkstyle.xml
 suppressions.xml
-pom.xml
 mvnw
 mvnw.cmd
 lombok.config
-src/main/resources
 hs_err_pid*
 out/
 HELP.md

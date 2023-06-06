@@ -1,64 +1,64 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ExistenceException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
-
+import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Objects;
 
-
+@Component
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/films")
-public class FilmController {
-    private int id = 0;
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    private static final  Logger log = LoggerFactory.getLogger(FilmController.class);
+public class FilmController extends AdviceController {
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<Film> getAllFilms() {
-        return films.values();
+        return filmService.getAllFilms();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getFilmById(@PathVariable int id) throws ExistenceException, ValidationException {
+        return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) {
+        return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
+                HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException {
-        try {
-            FilmValidator.validateFilm(film);
-            Integer filmId = generateId();
-            film.setId(filmId);
-            films.put(filmId, film);
-            return new ResponseEntity<>(film, HttpStatus.CREATED);
-        } catch (ValidationException e) {
-            log.error(e.getMessage(), e);
-            throw new ValidationException(e.getMessage());
-        }
+        filmService.createFilm(film);
+        return new ResponseEntity<>(film, HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<?> updateFilm(@RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())) {
-            try {
-                FilmValidator.validateFilm(film);
-                films.put(film.getId(), film);
-                return new ResponseEntity<>(film, HttpStatus.OK);
-            } catch (ValidationException e) {
-                log.error(e.getMessage(), e);
-                throw new ValidationException(e.getMessage());
-            }
-        } else {
-            String errorMessage = "Фильма с таким идентификатором нет в списке";
-            log.error(errorMessage);
-            throw new ValidationException(errorMessage);
-        }
+    public ResponseEntity<?> updateFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
+        filmService.updateFilm(film);
+        return new ResponseEntity<>(film, HttpStatus.OK);
     }
 
-    private int generateId() {
-        id++;
-        return id;
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity<?> addLike(@PathVariable int id,
+                                     @PathVariable int userId) throws ValidationException, ExistenceException {
+        filmService.addLike(id, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<?> removeLike(@PathVariable int id,
+                                        @PathVariable int userId) throws ValidationException, ExistenceException {
+        filmService.removeLike(id, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
