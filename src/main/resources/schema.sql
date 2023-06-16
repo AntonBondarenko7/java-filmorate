@@ -74,28 +74,25 @@ CREATE TABLE IF NOT EXISTS "mpa_ratings" (
 );
 
 
-ALTER TABLE "friendship" ADD CONSTRAINT "fk_friendship_user1_id" FOREIGN KEY("user1_id")
-REFERENCES "user" ("id");
+ALTER TABLE "friendship" ADD CONSTRAINT IF NOT EXISTS "fk_friendship_user1_id" FOREIGN KEY("user1_id")
+REFERENCES "users" ("id");
 
-ALTER TABLE "friendship" ADD CONSTRAINT "fk_friendship_user2_id" FOREIGN KEY("user2_id")
-REFERENCES "user" ("id");
+ALTER TABLE "friendship" ADD CONSTRAINT IF NOT EXISTS "fk_friendship_user2_id" FOREIGN KEY("user2_id")
+REFERENCES "users" ("id");
 
-ALTER TABLE "friendship" ADD CONSTRAINT "fk_friendship_status_id" FOREIGN KEY("status_id")
-REFERENCES "friendship_status" ("id");
+ALTER TABLE "films" ADD CONSTRAINT IF NOT EXISTS "fk_film_mpa_rating_id" FOREIGN KEY("mpa_rating_id")
+REFERENCES "mpa_ratings" ("id");
 
-ALTER TABLE "film" ADD CONSTRAINT "fk_film_mpa_rating_id" FOREIGN KEY("mpa_rating_id")
-REFERENCES "mpa_rating" ("id");
+ALTER TABLE "likes" ADD CONSTRAINT IF NOT EXISTS "fk_like_film_id" FOREIGN KEY("film_id")
+REFERENCES "films" ("id");
 
-ALTER TABLE "like" ADD CONSTRAINT "fk_like_film_id" FOREIGN KEY("film_id")
-REFERENCES "film" ("id");
+ALTER TABLE "likes" ADD CONSTRAINT IF NOT EXISTS "fk_like_user_id" FOREIGN KEY("user_id")
+REFERENCES "users" ("id");
 
-ALTER TABLE "like" ADD CONSTRAINT "fk_like_user_id" FOREIGN KEY("user_id")
-REFERENCES "user" ("id");
+ALTER TABLE "film_genre" ADD CONSTRAINT IF NOT EXISTS "fk_film_genre_film_id" FOREIGN KEY("film_id")
+REFERENCES "films" ("id");
 
-ALTER TABLE "film_genre" ADD CONSTRAINT "fk_film_genre_film_id" FOREIGN KEY("film_id")
-REFERENCES "film" ("id");
-
-ALTER TABLE "film_genre" ADD CONSTRAINT "fk_film_genre_genre_id" FOREIGN KEY("genre_id")
-REFERENCES "genre" ("id");
+ALTER TABLE "film_genre" ADD CONSTRAINT IF NOT EXISTS "fk_film_genre_genre_id" FOREIGN KEY("genre_id")
+REFERENCES "genres" ("id");
 
 

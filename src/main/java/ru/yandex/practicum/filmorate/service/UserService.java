@@ -4,44 +4,35 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendshipStorage friendshipStorage;
 
     public void addFriend(int id, int friendId) throws ValidationException, ExistenceException {
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
+        friendshipStorage.createFriendship(id, friendId);
     }
 
     public void removeFriend(int id, int friendId) throws ValidationException, ExistenceException {
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
+        friendshipStorage.deleteFriendship(id, friendId);
     }
 
     public ArrayList<User> getCommonFriends(int id, int friendId) throws ValidationException, ExistenceException {
         ArrayList<User> commonFriends = new ArrayList<>();
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
-        Set<Integer> userFriends = new HashSet<>(user.getFriends());
-        Set<Integer> friendFriends = new HashSet<>(friend.getFriends());
-        userFriends.retainAll(friendFriends);
-        for (Integer i : userFriends) {
+        ArrayList<Integer> commonFriendsIds = new ArrayList<>(friendshipStorage.getCommonFriendIds(id, friendId));
+        for (Integer i : commonFriendsIds) {
             commonFriends.add(userStorage.getUserById(i));
         }
         return commonFriends;
@@ -49,8 +40,19 @@ public class UserService {
 
     public ArrayList<User> getUserFriends(int userId) throws ValidationException, ExistenceException {
         ArrayList<User> friends = new ArrayList<>();
-        for (int id : userStorage.getUserById(userId).getFriends()) {
-            friends.add(userStorage.getUserById(id));
+        ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
+        for (Friendship f : friendships) {
+            User user = getUserById(f.getUser2Id());
+            friends.add(user);
+        }
+        return friends;
+    }
+
+    private ArrayList<Integer> getUserFriendsIds(int userId) {
+        ArrayList<Integer> friends = new ArrayList<>();
+        ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
+        for (Friendship f : friendships) {
+            friends.add(f.getUser2Id());
         }
         return friends;
     }
@@ -64,10 +66,16 @@ public class UserService {
     }
 
     public Collection<User> getAllUsers() {
-        return userStorage.getAllUsers().values();
+        Collection<User> users = userStorage.getAllUsers().values();
+        for (User u: users) {
+            u.setFriends(getUserFriendsIds(u.getId()));
+        }
+        return users;
     }
 
     public User getUserById(int userId) throws ValidationException, ExistenceException {
-        return userStorage.getUserById(userId);
+        User user = userStorage.getUserById(userId);
+        user.setFriends(getUserFriendsIds(userId));
+        return user;
     }
 }

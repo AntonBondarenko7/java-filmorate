@@ -7,9 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.dictionary.Genre;
-import ru.yandex.practicum.filmorate.dictionary.MpaRating;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,27 +18,29 @@ import java.util.Set;
 
 
 @Data
+@Builder
 public class Film {
 
     private Integer id;
     private final String name;
     private final String description;
-    private final Set<Integer> likes = new HashSet<>();
+    private Set<Integer> likes = new HashSet<>();
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate releaseDate;
     private final int duration;
-    private final List<Genre> genres = new ArrayList<>();
-    private final MpaRating mpaRating;
+    private List<Genre> genres = new ArrayList<>();
+    private MpaRating mpaRating;
 
     @JsonCreator
     public Film(@JsonProperty("id") int id,
                 @JsonProperty("name") String name,
                 @JsonProperty("description") String description,
                 @JsonProperty("releaseDate") LocalDate releaseDate,
-                @JsonProperty("duration") int duration, MpaRating mpaRating) {
+                @JsonProperty("duration") int duration,
+                @JsonProperty("mpaRating")MpaRating mpaRating) {
         this.id = id;
         this.name = name;
         this.description = description;
