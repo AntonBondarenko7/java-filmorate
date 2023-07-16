@@ -28,7 +28,7 @@ public class User {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    private ArrayList<Integer> friends = new ArrayList<>();
+    private ArrayList<Integer> friends;
 
     @JsonCreator
     public User(@JsonProperty("id") int id,

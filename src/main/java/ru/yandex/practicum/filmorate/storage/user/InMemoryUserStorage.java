@@ -41,7 +41,6 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-
     @Override
     public int generateId() {
         id++;

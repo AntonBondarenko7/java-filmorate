@@ -59,12 +59,14 @@ public class UserDbStorage implements UserStorage {
         try {
             UserValidator.validateUser(user);
             sqlQuery = "UPDATE \"users\" SET " +
-                    "\"email\" = ?, \"login\" = ?, \"name\" = ?, \"birthday\" = ?";
+                    "\"email\" = ?, \"login\" = ?, \"name\" = ?, \"birthday\" = ?" +
+                    "WHERE \"id\" = ?";
             jdbcTemplate.update(sqlQuery,
                     user.getEmail(),
                     user.getLogin(),
                     user.getName(),
-                    user.getBirthday());
+                    user.getBirthday(),
+                    user.getId());
             return user;
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());

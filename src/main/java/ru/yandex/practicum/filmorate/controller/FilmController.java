@@ -31,13 +31,13 @@ public class FilmController extends AdviceController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) {
+    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) throws ExistenceException {
         return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
                 HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException {
+    public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
         filmService.createFilm(film);
         return new ResponseEntity<>(film, HttpStatus.CREATED);
     }

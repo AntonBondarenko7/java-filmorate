@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import java.util.HashMap;
-import java.util.TreeSet;
+
+import java.util.*;
 
 public interface FilmStorage {
     Film createFilm(Film film) throws ValidationException;
@@ -15,9 +15,17 @@ public interface FilmStorage {
 
     HashMap<Integer, Film> getAllFilms();
 
-    int getFilmLikesCount(Film film);
-
-    TreeSet<Film> getMostPopularFilms();
+    default int getFilmLikesCount(Film film) {
+        throw new UnsupportedOperationException("Метод не поддерживается");
+    }
 
     Film getFilmById(int filmId) throws ValidationException, ExistenceException;
+
+    default List<Film> getMostPopularFilms(int count) throws ExistenceException {
+        throw new UnsupportedOperationException("Метод не поддерживается");
+    }
+
+    default TreeSet<Film> getMostPopularFilms() {
+        throw new UnsupportedOperationException("Метод не поддерживается");
+    }
 }
