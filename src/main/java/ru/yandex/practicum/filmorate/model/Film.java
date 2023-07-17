@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 public class Film {
 
-    private Integer id;
+    private int id;
     private final String name;
     private final String description;
     private Set<Integer> likes;
@@ -49,5 +49,4 @@ public class Film {
         this.genres = genres;
         this.mpa = mpa;
     }
-
 }

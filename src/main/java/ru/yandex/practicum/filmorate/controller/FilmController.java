@@ -38,14 +38,12 @@ public class FilmController extends AdviceController {
 
     @PostMapping
     public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
-        filmService.createFilm(film);
-        return new ResponseEntity<>(film, HttpStatus.CREATED);
+        return new ResponseEntity<>(filmService.createFilm(film), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<?> updateFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
-        filmService.updateFilm(film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+        return new ResponseEntity<>(filmService.updateFilm(film), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/like/{userId}")

@@ -63,7 +63,7 @@ public class FilmService {
             }
         }
         createdFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(createdFilm.getId()));
-        return getFilmById(createdFilm.getId());
+        return createdFilm;
     }
 
     public Film updateFilm(Film film) throws ValidationException, ExistenceException {
@@ -75,6 +75,6 @@ public class FilmService {
         }
         Film updatedFilm = filmStorage.updateFilm(film);
         updatedFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(updatedFilm.getId()));
-        return getFilmById(updatedFilm.getId());
+        return updatedFilm;
     }
 }
