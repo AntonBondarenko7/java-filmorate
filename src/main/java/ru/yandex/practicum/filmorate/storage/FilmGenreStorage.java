@@ -12,7 +12,9 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class FilmGenreStorage {
@@ -45,14 +47,14 @@ public class FilmGenreStorage {
         return jdbcTemplate.update(sqlQuery,filmId) > 0;
     }
 
-    public List<Genre> getFilmGenresByFilmId(int filmId) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"film_genres\" WHERE \"film_id\" = ?";
+    public Set<Genre> getFilmGenresByFilmId(int filmId) throws ExistenceException {
+        String sqlQuery = "SELECT * FROM \"film_genres\" WHERE \"film_id\" = ? ORDER BY \"genre_id\" ASC";
         List<FilmGenre> fglist = jdbcTemplate.query(sqlQuery, this::mapRowToFilmGenre, filmId);
-        List<Genre> glist = new ArrayList<>();
+        Set<Genre> gSet = new HashSet<>();
         for (FilmGenre fg : fglist) {
-            glist.add(genreStorage.getGenreById(fg.getGenreId()));
+            gSet.add(genreStorage.getGenreById(fg.getGenreId()));
         }
-        return glist;
+        return gSet;
     }
 
     private FilmGenre mapRowToFilmGenre(ResultSet resultSet, int rowNum) throws SQLException {

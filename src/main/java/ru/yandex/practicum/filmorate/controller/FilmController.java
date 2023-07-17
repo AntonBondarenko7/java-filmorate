@@ -21,7 +21,7 @@ public class FilmController extends AdviceController {
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() throws ExistenceException {
         return filmService.getAllFilms();
     }
 

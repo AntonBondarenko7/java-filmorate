@@ -21,7 +21,7 @@ public class LikeStorage {
     }
 
     public void createLike(int userId, int filmId) {
-        String sqlQuery = "INSERT INTO \"like\" (\"user_id\", \"film_id\")" +
+        String sqlQuery = "INSERT INTO \"likes\" (\"user_id\", \"film_id\")" +
                 "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }

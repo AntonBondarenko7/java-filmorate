@@ -48,6 +48,7 @@ public class FriendshipStorage {
 
     private Friendship mapRowToFriendship(ResultSet resultSet, int rowNum) throws SQLException {
         return Friendship.builder()
+                .id(resultSet.getInt("id"))
                 .user1Id(resultSet.getInt("user1_id"))
                 .user2Id(resultSet.getInt("user2_id"))
                 .status(resultSet.getBoolean("is_approved"))

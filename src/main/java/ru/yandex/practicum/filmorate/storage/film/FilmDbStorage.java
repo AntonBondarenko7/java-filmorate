@@ -38,13 +38,14 @@ public class FilmDbStorage implements FilmStorage {
             Integer filmId = generateId();
             film.setId(filmId);
             String sqlQuery = "INSERT INTO \"films\"(\"id\", \"name\", \"description\", \"release_date\", " +
-                    "\"duration\") VALUES (?, ?, ?, ?, ?)";
+                    "\"duration\", \"mpa_rating_id\") VALUES (?, ?, ?, ?, ?, ?)";
             jdbcTemplate.update(sqlQuery,
                     filmId,
                     film.getName(),
                     film.getDescription(),
                     film.getReleaseDate(),
-                    film.getDuration());
+                    film.getDuration(),
+                    film.getMpa().getId());
             return film;
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
@@ -57,15 +58,16 @@ public class FilmDbStorage implements FilmStorage {
         try {
             FilmValidator.validateFilm(film);
             String sqlQuery = "UPDATE \"films\" SET " +
-                    "\"name\" = ?, \"description\" = ?, \"release_date\" = ?, \"duration\" = ?" +
+                    "\"name\" = ?, \"description\" = ?, \"release_date\" = ?, \"duration\" = ?, \"mpa_rating_id\" = ?" +
                     "WHERE \"id\" = ?";
             jdbcTemplate.update(sqlQuery,
                     film.getName(),
                     film.getDescription(),
                     film.getReleaseDate(),
                     film.getDuration(),
+                    film.getMpa().getId(),
                     film.getId());
-            return film;
+            return getFilmById(film.getId());
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
@@ -101,10 +103,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getMostPopularFilms(int count) throws ExistenceException {
-        String sqlQuery = "SELECT COUNT(\"l.id\") FROM \"films\" \"f\"\n" +
-                "INNER JOIN \"likes\" \"l\" on \"f.id\" = \"l.film_id\"\n" +
-                "GROUP BY \"f.id\"\n" +
-                "ORDER BY COUNT(\"l.id\") DESC\n" +
+        String sqlQuery = "SELECT * " +
+                "FROM \"films\"\n" +
+                "LEFT JOIN \"likes\" on \"films\".\"id\" = \"likes\".\"film_id\"\n" +
+                "GROUP BY \"films\".\"id\"\n" +
+                "ORDER BY COUNT(\"likes\".\"id\") DESC\n" +
                 "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
             try {
@@ -148,7 +151,7 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
-                .mpaRating(mpaStorage.getMpaRatingById(resultSet.getInt("mpa_rating_id")))
+                .mpa(mpaStorage.getMpaRatingById(resultSet.getInt("mpa_rating_id")))
                 .build();
     }
 }

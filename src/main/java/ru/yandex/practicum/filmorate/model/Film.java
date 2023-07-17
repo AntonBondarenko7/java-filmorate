@@ -9,9 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
-
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,8 +28,8 @@ public class Film {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate releaseDate;
     private final int duration;
-    private List<Genre> genres;
-    private MpaRating mpaRating;
+    private Set<Genre> genres;
+    private MpaRating mpa;
 
     @JsonCreator
     public Film(@JsonProperty("id") int id,
@@ -40,8 +38,8 @@ public class Film {
                 @JsonProperty("likes") Set<Integer> likes,
                 @JsonProperty("releaseDate") LocalDate releaseDate,
                 @JsonProperty("duration") int duration,
-                @JsonProperty("genres") List<Genre> genres,
-                @JsonProperty("mpaRating")MpaRating mpaRating) {
+                @JsonProperty("genres") Set<Genre> genres,
+                @JsonProperty("mpa")MpaRating mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -49,7 +47,7 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.genres = genres;
-        this.mpaRating = mpaRating;
+        this.mpa = mpa;
     }
 
 }

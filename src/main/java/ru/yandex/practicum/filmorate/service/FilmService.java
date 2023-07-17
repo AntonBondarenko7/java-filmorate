@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.Collection;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +33,20 @@ public class FilmService {
         likeStorage.deleteLike(userId, filmId);
     }
 
-    public List<Film> getMostPopularFilms(int count) throws ExistenceException {
-        return filmStorage.getMostPopularFilms(count);
+    public Collection<Film> getMostPopularFilms(int count) throws ExistenceException {
+        Collection<Film> films = filmStorage.getMostPopularFilms(count);
+        for(Film f: films) {
+            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
+        }
+        return films;
     }
 
-    public Collection<Film> getAllFilms() {
-        return filmStorage.getAllFilms().values();
+    public Collection<Film> getAllFilms() throws ExistenceException {
+        Collection<Film> films = filmStorage.getAllFilms().values();
+        for(Film f: films) {
+            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
+        }
+        return films;
     }
 
     public Film getFilmById(int filmId) throws ValidationException, ExistenceException {
@@ -49,12 +56,14 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) throws ValidationException, ExistenceException {
+        Film createdFilm = filmStorage.createFilm(film);
         if (film.getGenres() != null) {
             for (Genre g : film.getGenres()) {
                 filmGenreStorage.createFilmGenre(film.getId(), g.getId());
             }
         }
-        return filmStorage.createFilm(film);
+        createdFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(createdFilm.getId()));
+        return getFilmById(createdFilm.getId());
     }
 
     public Film updateFilm(Film film) throws ValidationException, ExistenceException {
@@ -64,6 +73,8 @@ public class FilmService {
                 filmGenreStorage.createFilmGenre(film.getId(), g.getId());
             }
         }
-        return filmStorage.updateFilm(film);
+        Film updatedFilm = filmStorage.updateFilm(film);
+        updatedFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(updatedFilm.getId()));
+        return getFilmById(updatedFilm.getId());
     }
 }

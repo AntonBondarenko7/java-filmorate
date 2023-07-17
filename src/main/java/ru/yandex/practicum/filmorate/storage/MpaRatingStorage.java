@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -48,26 +47,25 @@ public class MpaRatingStorage {
         }
     }
 
-    public MpaRating updateMpaRating(MpaRating mpaRating) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"mpa_ratings\"" +
-                "WHERE \"id\" = ?";
-        try {
-            jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, mpaRating.getId());
-        } catch (EmptyResultDataAccessException e) {
-            String errorMessage = "Рейтинга с таким идентификатором нет в списке";
-            throw new ExistenceException(errorMessage);
-        }
-
-        sqlQuery = "UPDATE \"mpa_ratings\" SET \"name\" = ?, \"description\" = ? WHERE \"id\" = ?";
-        jdbcTemplate.update(sqlQuery, mpaRating.getName(), mpaRating.getDescription(), mpaRating.getId());
-        return mpaRating;
-    }
+//    public MpaRating updateMpaRating(MpaRating mpa) throws ExistenceException {
+//        String sqlQuery = "SELECT * FROM \"mpa_ratings\"" +
+//                "WHERE \"id\" = ?";
+//        try {
+//            jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, mpa.getId());
+//        } catch (EmptyResultDataAccessException e) {
+//            String errorMessage = "Рейтинга с таким идентификатором нет в списке";
+//            throw new ExistenceException(errorMessage);
+//        }
+//
+//        sqlQuery = "UPDATE \"mpa_ratings\" SET \"name\" = ?, \"description\" = ? WHERE \"id\" = ?";
+//        jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getDescription(), mpa.getId());
+//        return mpa;
+//    }
 
     private MpaRating mapRowToMpaRating(ResultSet resultSet, int rowNum) throws SQLException {
         return MpaRating.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
                 .build();
     }
 }
