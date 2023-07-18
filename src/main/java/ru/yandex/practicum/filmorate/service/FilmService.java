@@ -26,7 +26,6 @@ public class FilmService {
         likeStorage.createLike(userId, filmId);
     }
 
-
     public void removeLike(int filmId, int userId) throws ValidationException, ExistenceException {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);

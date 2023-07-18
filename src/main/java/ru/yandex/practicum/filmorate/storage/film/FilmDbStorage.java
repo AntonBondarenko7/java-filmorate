@@ -8,14 +8,10 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
-
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,7 +31,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film createFilm(Film film) throws ValidationException {
         try {
             FilmValidator.validateFilm(film);
-            Integer filmId = generateId();
+            int filmId = generateId();
             film.setId(filmId);
             String sqlQuery = "INSERT INTO \"films\"(\"id\", \"name\", \"description\", \"release_date\", " +
                     "\"duration\", \"mpa_rating_id\") VALUES (?, ?, ?, ?, ?, ?)";

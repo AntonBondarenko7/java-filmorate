@@ -10,7 +10,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 

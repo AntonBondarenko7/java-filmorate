@@ -52,8 +52,6 @@ public class UserDbStorageTests {
 
         User createdUser = userStorage.createUser(user);
 
-        assertNotNull(createdUser);
-        assertNotNull(createdUser.getId());
         assertEquals(user.getName(), createdUser.getName());
         assertEquals(user.getEmail(), createdUser.getEmail());
         assertEquals(user.getLogin(), createdUser.getLogin());
@@ -112,7 +110,7 @@ public class UserDbStorageTests {
     public void testDeleteUserById() {
         int userId = userStorage.getAllUsers().keySet().stream().findFirst().get().intValue();
         userStorage.deleteUserById(userId);
-        assertThrows(ExistenceException.class, () -> {userStorage.getUserById(userId);});
+        assertThrows(ExistenceException.class, () -> userStorage.getUserById(userId));
     }
 
     @Test

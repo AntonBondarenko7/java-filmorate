@@ -22,13 +22,18 @@ public class MpaRatingStorage {
     public void createMpaRating(String name, String description) {
         String sqlQuery = "INSERT INTO \"mpa_ratings\" (\"name\", \"description\")" +
                 "VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery,name, description, false);
+        jdbcTemplate.update(sqlQuery,name, description);
     }
 
     public boolean deleteMpaRating(int id) {
         String sqlQuery = "DELETE FROM \"mpa_ratings\"" +
                 "WHERE \"id\" = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
+    }
+
+    public boolean deleteAllMpaRatings() {
+        String sqlQuery = "DELETE FROM \"mpa_ratings\"";
+        return jdbcTemplate.update(sqlQuery) > 0;
     }
 
     public List<MpaRating> getAllMpaRatings() {
@@ -58,14 +63,15 @@ public class MpaRatingStorage {
         }
 
         sqlQuery = "UPDATE \"mpa_ratings\" SET \"name\" = ?, \"description\" = ? WHERE \"id\" = ?";
-        jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getId());
-        return mpa;
+        jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getDescription(), mpa.getId());
+        return getMpaRatingById(mpa.getId());
     }
 
     private MpaRating mapRowToMpaRating(ResultSet resultSet, int rowNum) throws SQLException {
         return MpaRating.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
                 .build();
     }
 }

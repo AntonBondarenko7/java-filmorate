@@ -21,7 +21,7 @@ public class GenreStorage {
 
     public void createGenre(String name) {
         String sqlQuery = "INSERT INTO \"genres\" (\"name\")" +
-                "VALUES (?, ?)";
+                "VALUES (?)";
         jdbcTemplate.update(sqlQuery,name);
     }
 
@@ -29,6 +29,11 @@ public class GenreStorage {
         String sqlQuery = "DELETE FROM \"genres\"" +
                 "WHERE \"id\" = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
+    }
+
+    public boolean deleteAllGenres() {
+        String sqlQuery = "DELETE FROM \"genres\"";
+        return jdbcTemplate.update(sqlQuery) > 0;
     }
 
     public List<Genre> getAllGenres() {

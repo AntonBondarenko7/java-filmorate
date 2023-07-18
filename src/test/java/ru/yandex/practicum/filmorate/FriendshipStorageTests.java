@@ -83,8 +83,7 @@ public class FriendshipStorageTests {
     @Test
     public void testUpdateFriendship() {
         friendshipStorage.createFriendship(userId, friendId);
-        Friendship friendship = friendshipStorage.getUserFriendships(userId).get(0);
-        friendshipStorage.updateFriendship(friendship);
+        friendshipStorage.updateFriendship();
         List<Friendship> userFriendships = friendshipStorage.getUserFriendships(userId);
 
         assertEquals(1, userFriendships.size());

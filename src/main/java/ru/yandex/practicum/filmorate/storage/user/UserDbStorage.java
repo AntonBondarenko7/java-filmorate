@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
