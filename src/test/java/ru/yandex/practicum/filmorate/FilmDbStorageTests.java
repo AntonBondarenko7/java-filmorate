@@ -86,6 +86,7 @@ public class FilmDbStorageTests {
         assertEquals(film.getDuration(), updatedFilm.getDuration());
         assertEquals(film.getMpa(), updatedFilm.getMpa());
     }
+
     @Test
     public void testGetAllFilms() {
         HashMap<Integer, Film> filmsMap = filmDbStorage.getAllFilms();

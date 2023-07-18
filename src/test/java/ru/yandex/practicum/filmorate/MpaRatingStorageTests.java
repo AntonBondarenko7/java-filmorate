@@ -41,7 +41,6 @@ public class MpaRatingStorageTests {
         assertEquals(description, mpa.get(0).getDescription());
     }
 
-
     @Test
     public void testDeleteMpaRating() {
         String name = "Test";

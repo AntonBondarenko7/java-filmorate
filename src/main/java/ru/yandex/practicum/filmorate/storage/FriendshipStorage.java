@@ -41,6 +41,7 @@ public class FriendshipStorage {
 
         return jdbcTemplate.queryForList(sqlQuery, Integer.class, user1Id, friendId);
     }
+
     public void updateFriendship() {
         String sqlQuery = "UPDATE \"friendships\" SET \"is_approved\" = true";
         jdbcTemplate.update(sqlQuery);
