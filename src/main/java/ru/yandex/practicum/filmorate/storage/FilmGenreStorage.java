@@ -6,12 +6,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,12 +29,6 @@ public class FilmGenreStorage {
         String sqlQuery = "INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\")" +
                           "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
-    }
-
-    public boolean deleteFilmGenre(int filmId, int genreId) {
-        String sqlQuery = "DELETE FROM \"film_genres\" " +
-                          "WHERE \"film_id\" = ? AND \"genre_id\" = ?";
-        return jdbcTemplate.update(sqlQuery,filmId, genreId) > 0;
     }
 
     public boolean deleteAllFilmGenresByFilmId(int filmId) {

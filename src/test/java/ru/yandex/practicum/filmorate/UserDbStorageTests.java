@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,11 @@ public class UserDbStorageTests {
         userStorage.createUser(user);
     }
 
+    @AfterEach
+    void tearDown() {
+        userStorage.deleteAllUsers();
+    }
+
     @Test
     public void testCreateUser() throws ValidationException {
         User user = User.builder()
@@ -56,8 +62,9 @@ public class UserDbStorageTests {
 
     @Test
     public void testUpdateUser() throws ValidationException, ExistenceException {
+        int userId = userStorage.getAllUsers().keySet().stream().findFirst().get().intValue();
         User userToUpdate = User.builder()
-                .id(1)
+                .id(userId)
                 .email("updated@example.com")
                 .login("updateduser")
                 .name("Updated User")
@@ -83,22 +90,34 @@ public class UserDbStorageTests {
 
     @Test
     public void testGetUserById() throws ExistenceException, ValidationException {
-        int userId = 2;
         User user = User.builder()
-                .email("test@example.com")
-                .login("testuser")
-                .name("Test User")
+                .email("test2@example.com")
+                .login("testuser2")
+                .name("Test User2")
                 .birthday(LocalDate.of(1990, 1, 1))
                 .build();
 
         User createdUser = userStorage.createUser(user);
-        User retrievedUser = userStorage.getUserById(userId);
+        User retrievedUser = userStorage.getUserById(createdUser.getId());
 
         assertNotNull(retrievedUser);
-        assertEquals(userId, retrievedUser.getId());
+        assertEquals(createdUser.getId(), retrievedUser.getId());
         assertEquals(retrievedUser.getName(), createdUser.getName());
         assertEquals(retrievedUser.getEmail(), createdUser.getEmail());
         assertEquals(retrievedUser.getLogin(), createdUser.getLogin());
         assertEquals(retrievedUser.getBirthday(), createdUser.getBirthday());
+    }
+
+    @Test
+    public void testDeleteUserById() {
+        int userId = userStorage.getAllUsers().keySet().stream().findFirst().get().intValue();
+        userStorage.deleteUserById(userId);
+        assertThrows(ExistenceException.class, () -> {userStorage.getUserById(userId);});
+    }
+
+    @Test
+    public void testDeleteAllUsers() {
+        userStorage.deleteAllUsers();
+        assertTrue(userStorage.getAllUsers().isEmpty());
     }
 }

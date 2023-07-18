@@ -51,7 +51,7 @@ public class FriendshipStorage {
                 .id(resultSet.getInt("id"))
                 .user1Id(resultSet.getInt("user1_id"))
                 .user2Id(resultSet.getInt("user2_id"))
-                .status(resultSet.getBoolean("is_approved"))
+                .isApproved(resultSet.getBoolean("is_approved"))
                 .build();
     }
 }

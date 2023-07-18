@@ -47,20 +47,20 @@ public class MpaRatingStorage {
         }
     }
 
-//    public MpaRating updateMpaRating(MpaRating mpa) throws ExistenceException {
-//        String sqlQuery = "SELECT * FROM \"mpa_ratings\"" +
-//                "WHERE \"id\" = ?";
-//        try {
-//            jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, mpa.getId());
-//        } catch (EmptyResultDataAccessException e) {
-//            String errorMessage = "Рейтинга с таким идентификатором нет в списке";
-//            throw new ExistenceException(errorMessage);
-//        }
-//
-//        sqlQuery = "UPDATE \"mpa_ratings\" SET \"name\" = ?, \"description\" = ? WHERE \"id\" = ?";
-//        jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getDescription(), mpa.getId());
-//        return mpa;
-//    }
+    public MpaRating updateMpaRating(MpaRating mpa) throws ExistenceException {
+        String sqlQuery = "SELECT * FROM \"mpa_ratings\"" +
+                "WHERE \"id\" = ?";
+        try {
+            jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, mpa.getId());
+        } catch (EmptyResultDataAccessException e) {
+            String errorMessage = "Рейтинга с таким идентификатором нет в списке";
+            throw new ExistenceException(errorMessage);
+        }
+
+        sqlQuery = "UPDATE \"mpa_ratings\" SET \"name\" = ?, \"description\" = ? WHERE \"id\" = ?";
+        jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getId());
+        return mpa;
+    }
 
     private MpaRating mapRowToMpaRating(ResultSet resultSet, int rowNum) throws SQLException {
         return MpaRating.builder()

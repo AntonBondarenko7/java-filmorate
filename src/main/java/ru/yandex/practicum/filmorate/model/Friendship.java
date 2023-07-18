@@ -11,5 +11,5 @@ public class Friendship {
     private final int id;
     private final int user1Id;
     private final int user2Id;
-    private boolean status;
+    private boolean isApproved;
 }

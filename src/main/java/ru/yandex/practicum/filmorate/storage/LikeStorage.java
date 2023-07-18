@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.model.Like;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -30,6 +27,11 @@ public class LikeStorage {
         String sqlQuery = "DELETE FROM \"likes\" " +
                 "WHERE \"user_id\" = ? AND \"film_id\" = ?";
         return jdbcTemplate.update(sqlQuery, userId, filmId) > 0;
+    }
+
+    public boolean deleteAllLikes() {
+        String sqlQuery = "DELETE FROM \"likes\"";
+        return jdbcTemplate.update(sqlQuery) > 0;
     }
 
     public List<Like> getLikesByUserId(int userId) {
