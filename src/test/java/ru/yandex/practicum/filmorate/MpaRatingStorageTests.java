@@ -24,8 +24,8 @@ public class MpaRatingStorageTests {
     private final MpaRatingStorage mpaRatingStorage;
 
     @BeforeEach
-    void seUp(){
-        mpaRatingStorage.deleteAllMpaRatings();
+    void seUp() {
+         mpaRatingStorage.deleteAllMpaRatings();
     }
 
     @Test
