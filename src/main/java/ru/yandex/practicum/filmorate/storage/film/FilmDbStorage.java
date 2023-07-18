@@ -21,6 +21,7 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final MpaRatingStorage mpaStorage;
     private int id = 0;
+
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaRatingStorage mpaStorage) {
         this.jdbcTemplate = jdbcTemplate;
