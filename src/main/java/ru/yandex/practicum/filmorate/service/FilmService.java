@@ -34,7 +34,7 @@ public class FilmService {
 
     public Collection<Film> getMostPopularFilms(int count) throws ExistenceException {
         Collection<Film> films = filmStorage.getMostPopularFilms(count);
-        for(Film f: films) {
+        for (Film f: films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
         }
         return films;
@@ -42,7 +42,7 @@ public class FilmService {
 
     public Collection<Film> getAllFilms() throws ExistenceException {
         Collection<Film> films = filmStorage.getAllFilms().values();
-        for(Film f: films) {
+        for (Film f: films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
         }
         return films;
