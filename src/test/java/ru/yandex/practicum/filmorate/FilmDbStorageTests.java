@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -24,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Transactional
+@Rollback
 public class FilmDbStorageTests {
     private final FilmDbStorage filmDbStorage;
     private final MpaRatingStorage mpaStorage;
@@ -41,12 +44,6 @@ public class FilmDbStorageTests {
                 .build();
 
         filmDbStorage.createFilm(film);
-    }
-
-    @AfterEach
-    void tearDown() {
-        likeStorage.deleteAllLikes();
-        filmDbStorage.deleteAllFilms();
     }
 
     @Test
@@ -149,11 +146,5 @@ public class FilmDbStorageTests {
         int filmId = filmDbStorage.getAllFilms().keySet().stream().findFirst().get().intValue();
         filmDbStorage.deleteFilmById(filmId);
         assertThrows(ExistenceException.class, () -> {filmDbStorage.getFilmById(filmId);});
-    }
-
-    @Test
-    public void testDeleteAllFilms() {
-        filmDbStorage.deleteAllFilms();
-        assertTrue(filmDbStorage.getAllFilms().isEmpty());
     }
 }

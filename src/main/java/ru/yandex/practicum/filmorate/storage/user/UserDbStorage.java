@@ -112,11 +112,6 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
-    public boolean deleteAllUsers() {
-        String sqlQuery = "DELETE FROM \"users\"";
-        return jdbcTemplate.update(sqlQuery) > 0;
-    }
-
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("id"))

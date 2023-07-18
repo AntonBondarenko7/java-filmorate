@@ -146,11 +146,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
-    public boolean deleteAllFilms() {
-        String sqlQuery = "DELETE FROM \"films\"";
-        return jdbcTemplate.update(sqlQuery) > 0;
-    }
-
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {
         return Film.builder()
                 .id(resultSet.getInt("id"))
