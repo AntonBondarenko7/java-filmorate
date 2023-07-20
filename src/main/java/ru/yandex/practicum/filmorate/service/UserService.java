@@ -57,7 +57,7 @@ public class UserService {
         return friends;
     }
 
-    public User createUser(User user) throws ValidationException {
+    public User createUser(User user) throws ValidationException, ExistenceException {
         return userStorage.createUser(user);
     }
 

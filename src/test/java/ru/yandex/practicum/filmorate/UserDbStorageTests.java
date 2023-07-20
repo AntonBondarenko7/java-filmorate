@@ -27,7 +27,7 @@ public class UserDbStorageTests {
     private final UserDbStorage userStorage;
 
     @BeforeEach
-    void setUp() throws ValidationException {
+    void setUp() throws ValidationException, ExistenceException {
         User user = User.builder()
                 .email("test@example.com")
                 .login("testuser")
@@ -39,14 +39,13 @@ public class UserDbStorageTests {
     }
 
     @Test
-    public void testCreateUser() throws ValidationException {
+    public void testCreateUser() throws ValidationException, ExistenceException {
         User user = User.builder()
-                .email("test@example.com")
-                .login("testuser")
+                .email("test1@example.com")
+                .login("testuser1")
                 .name("Test User")
                 .birthday(LocalDate.of(1990, 1, 1))
                 .build();
-
 
         User createdUser = userStorage.createUser(user);
 

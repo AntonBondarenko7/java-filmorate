@@ -26,19 +26,17 @@ public class FilmGenreStorage {
 
     public void createFilmGenre(int filmId, int genreId) throws ExistenceException {
         genreStorage.getGenreById(genreId);
-        String sqlQuery = "INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\")" +
-                          "VALUES (?, ?)";
+        String sqlQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
     }
 
     public boolean deleteAllFilmGenresByFilmId(int filmId) {
-        String sqlQuery = "DELETE FROM \"film_genres\" " +
-                "WHERE \"film_id\" = ?";
+        String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?";
         return jdbcTemplate.update(sqlQuery,filmId) > 0;
     }
 
     public Set<Genre> getFilmGenresByFilmId(int filmId) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"film_genres\" WHERE \"film_id\" = ? ORDER BY \"genre_id\" ASC";
+        String sqlQuery = "SELECT * FROM film_genres WHERE film_id = ? ORDER BY genre_id ASC";
         List<FilmGenre> fglist = jdbcTemplate.query(sqlQuery, this::mapRowToFilmGenre, filmId);
         Set<Genre> gSet = new HashSet<>();
         for (FilmGenre fg : fglist) {

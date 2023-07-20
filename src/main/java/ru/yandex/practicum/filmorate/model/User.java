@@ -26,19 +26,4 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
     private ArrayList<Integer> friends;
-
-    @JsonCreator
-    public User(@JsonProperty("id") int id,
-                @JsonProperty("email") String email,
-                @JsonProperty("login") String login,
-                @JsonProperty("name") String name,
-                @JsonProperty("birthday") LocalDate birthday,
-                @JsonProperty("friends") ArrayList<Integer> friends) {
-        this.id = id;
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-        this.friends = friends;
-    }
 }

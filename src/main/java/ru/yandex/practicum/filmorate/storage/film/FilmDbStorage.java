@@ -8,10 +8,12 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +22,6 @@ import java.util.List;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final MpaRatingStorage mpaStorage;
-    private int id = 0;
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaRatingStorage mpaStorage) {
@@ -32,19 +33,16 @@ public class FilmDbStorage implements FilmStorage {
     public Film createFilm(Film film) throws ValidationException {
         try {
             FilmValidator.validateFilm(film);
-            int filmId = generateId();
-            film.setId(filmId);
-            String sqlQuery = "INSERT INTO \"films\"(\"id\", \"name\", \"description\", \"release_date\", " +
-                    "\"duration\", \"mpa_rating_id\") VALUES (?, ?, ?, ?, ?, ?)";
+            String sqlQuery = "INSERT INTO films (name, description, release_date, " +
+                    "duration, mpa_rating_id) VALUES (?, ?, ?, ?, ?)";
             jdbcTemplate.update(sqlQuery,
-                    filmId,
                     film.getName(),
                     film.getDescription(),
                     film.getReleaseDate(),
                     film.getDuration(),
                     film.getMpa().getId());
-            return film;
-        } catch (ValidationException e) {
+            return getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate());
+        } catch (ValidationException | ExistenceException e) {
             throw new ValidationException(e.getMessage());
         }
     }
@@ -54,9 +52,9 @@ public class FilmDbStorage implements FilmStorage {
         getFilmById(film.getId());
         try {
             FilmValidator.validateFilm(film);
-            String sqlQuery = "UPDATE \"films\" SET " +
-                    "\"name\" = ?, \"description\" = ?, \"release_date\" = ?, \"duration\" = ?, \"mpa_rating_id\" = ?" +
-                    "WHERE \"id\" = ?";
+            String sqlQuery = "UPDATE films SET " +
+                    "name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?" +
+                    "WHERE id = ?";
             jdbcTemplate.update(sqlQuery,
                     film.getName(),
                     film.getDescription(),
@@ -71,18 +69,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public int generateId() {
-        if (id == 0) {
-            id = getCurrentMaxId() + 1;
-        } else {
-            id++;
-        }
-        return id;
-    }
-
-    @Override
     public HashMap<Integer, Film> getAllFilms() {
-        String sqlQuery = "SELECT * FROM \"films\"";
+        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                "FROM films f\n" +
+                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id";
         List<Film> filmList = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
             try {
                 return mapRowToFilm(resultSet, rowNum);
@@ -99,12 +90,35 @@ public class FilmDbStorage implements FilmStorage {
         return filmMap;
     }
 
+    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate) throws ExistenceException {
+        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                "FROM films f\n" +
+                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                "WHERE f.name = ? AND f.release_date = ?";
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, name, releaseDate);
+        } catch (EmptyResultDataAccessException e) {
+            String errorMessage = "Фильма с такими данными нет в списке";
+            throw new ExistenceException(errorMessage);
+        }
+    }
+
     public List<Film> getMostPopularFilms(int count) throws ExistenceException {
-        String sqlQuery = "SELECT * " +
-                "FROM \"films\"\n" +
-                "LEFT JOIN \"likes\" on \"films\".\"id\" = \"likes\".\"film_id\"\n" +
-                "GROUP BY \"films\".\"id\"\n" +
-                "ORDER BY COUNT(\"likes\".\"id\") DESC\n" +
+
+        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                "FROM films f\n" +
+                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                "LEFT JOIN likes l on f.id = l.film_id\n" +
+                "GROUP BY f.id\n" +
+                "ORDER BY COUNT(l.id) DESC\n" +
                 "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
             try {
@@ -117,7 +131,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(int filmId) throws ExistenceException {
-        String sqlQuery = "SELECT * from \"films\" WHERE \"id\" = ?";
+        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                "FROM films f\n" +
+                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                "WHERE f.id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> {
                 try {
@@ -132,19 +150,9 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private int getCurrentMaxId() {
-        String sqlQuery = "SELECT max(\"id\") FROM  \"films\"";
-        if (jdbcTemplate.queryForObject(sqlQuery, Integer.class) == null) {
-            return 0;
-        } else {
-            return jdbcTemplate.queryForObject(sqlQuery, Integer.class);
-        }
-    }
-
-    public boolean deleteFilmById(int id) {
-        String sqlQuery = "DELETE FROM \"films\"" +
-                "WHERE \"id\" = ?";
-        return jdbcTemplate.update(sqlQuery, id) > 0;
+    public void deleteFilmById(int id) {
+        String sqlQuery = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {
@@ -154,7 +162,10 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
-                .mpa(mpaStorage.getMpaRatingById(resultSet.getInt("mpa_rating_id")))
+                .mpa(MpaRating.builder().id(resultSet.getInt("mpa_rating_id"))
+                                        .name(resultSet.getString("MPA_NAME"))
+                                        .description(resultSet.getString("mpa_description"))
+                                        .build())
                 .build();
     }
 }

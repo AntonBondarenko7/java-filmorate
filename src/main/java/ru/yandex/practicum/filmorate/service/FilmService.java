@@ -58,7 +58,7 @@ public class FilmService {
         Film createdFilm = filmStorage.createFilm(film);
         if (film.getGenres() != null) {
             for (Genre g : film.getGenres()) {
-                filmGenreStorage.createFilmGenre(film.getId(), g.getId());
+                filmGenreStorage.createFilmGenre(createdFilm.getId(), g.getId());
             }
         }
         createdFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(createdFilm.getId()));

@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
@@ -33,7 +34,7 @@ public class FriendshipStorageTests {
     private int friendId;
 
     @BeforeEach
-    void setUp() throws ValidationException {
+    void setUp() throws ValidationException, ExistenceException {
         User user = User.builder()
                 .email("test@example.com")
                 .login("testuser")
@@ -95,7 +96,7 @@ public class FriendshipStorageTests {
     }
 
     @Test
-    public void testGetCommonFriendIds() throws ValidationException {
+    public void testGetCommonFriendIds() throws ValidationException, ExistenceException {
         User commonFriend = User.builder()
                 .email("commonFriend@example.com")
                 .login("commonFriend")

@@ -11,7 +11,9 @@ public interface FilmStorage {
 
     Film updateFilm(Film film) throws ValidationException, ExistenceException;
 
-    int generateId();
+    default int generateId() {
+        throw new UnsupportedOperationException("Метод не поддерживается");
+    }
 
     HashMap<Integer, Film> getAllFilms();
 

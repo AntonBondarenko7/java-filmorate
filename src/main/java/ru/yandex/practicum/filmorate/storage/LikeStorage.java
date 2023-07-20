@@ -18,29 +18,29 @@ public class LikeStorage {
     }
 
     public void createLike(int userId, int filmId) {
-        String sqlQuery = "INSERT INTO \"likes\" (\"user_id\", \"film_id\")" +
+        String sqlQuery = "INSERT INTO likes (user_id, film_id)" +
                 "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
     public boolean deleteLike(int userId, int filmId) {
-        String sqlQuery = "DELETE FROM \"likes\" " +
-                "WHERE \"user_id\" = ? AND \"film_id\" = ?";
+        String sqlQuery = "DELETE FROM likes " +
+                "WHERE user_id = ? AND film_id = ?";
         return jdbcTemplate.update(sqlQuery, userId, filmId) > 0;
     }
 
     public boolean deleteAllLikes() {
-        String sqlQuery = "DELETE FROM \"likes\"";
+        String sqlQuery = "DELETE FROM likes";
         return jdbcTemplate.update(sqlQuery) > 0;
     }
 
     public List<Like> getLikesByUserId(int userId) {
-        String sqlQuery = "SELECT * FROM \"likes\" WHERE \"user_id\" = ?";
+        String sqlQuery = "SELECT * FROM likes WHERE user_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToLike, userId);
     }
 
     public List<Like> getLikesByFilmId(int filmId) {
-        String sqlQuery = "SELECT * FROM \"likes\" WHERE \"film_id\" = ?";
+        String sqlQuery = "SELECT * FROM likes WHERE film_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToLike, filmId);
     }
 

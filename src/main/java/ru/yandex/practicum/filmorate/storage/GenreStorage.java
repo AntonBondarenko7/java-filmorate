@@ -20,30 +20,27 @@ public class GenreStorage {
     }
 
     public void createGenre(String name) {
-        String sqlQuery = "INSERT INTO \"genres\" (\"name\")" +
-                "VALUES (?)";
+        String sqlQuery = "INSERT INTO genres (name) VALUES (?)";
         jdbcTemplate.update(sqlQuery,name);
     }
 
     public boolean deleteGenre(int id) {
-        String sqlQuery = "DELETE FROM \"genres\"" +
-                "WHERE \"id\" = ?";
+        String sqlQuery = "DELETE FROM genres WHERE id = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
     public boolean deleteAllGenres() {
-        String sqlQuery = "DELETE FROM \"genres\"";
+        String sqlQuery = "DELETE FROM genres";
         return jdbcTemplate.update(sqlQuery) > 0;
     }
 
     public List<Genre> getAllGenres() {
-        String sqlQuery = "SELECT * FROM \"genres\"";
+        String sqlQuery = "SELECT * FROM genres";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
 
     public Genre getGenreById(int id) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"genres\"" +
-                "WHERE \"id\" = ?";
+        String sqlQuery = "SELECT * FROM genres WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
         } catch (EmptyResultDataAccessException e) {
@@ -53,8 +50,7 @@ public class GenreStorage {
     }
 
     public Genre updateGenre(Genre genre) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"genres\"" +
-                "WHERE \"id\" = ?";
+        String sqlQuery = "SELECT * FROM genres WHERE id = ?";
         try {
             jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genre.getId());
         } catch (EmptyResultDataAccessException e) {
@@ -62,7 +58,7 @@ public class GenreStorage {
             throw new ExistenceException(errorMessage);
         }
 
-        sqlQuery = "UPDATE \"genres\" SET \"name\" = ? WHERE \"id\" = ?";
+        sqlQuery = "UPDATE genres SET name = ? WHERE id = ?";
         jdbcTemplate.update(sqlQuery, genre.getName(), genre.getId());
         return genre;
     }

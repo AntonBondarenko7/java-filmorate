@@ -40,7 +40,6 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ExistenceException(errorMessage);
         }
     }
-
     @Override
     public int generateId() {
         id++;

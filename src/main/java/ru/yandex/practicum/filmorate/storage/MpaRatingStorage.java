@@ -20,30 +20,27 @@ public class MpaRatingStorage {
     }
 
     public void createMpaRating(String name, String description) {
-        String sqlQuery = "INSERT INTO \"mpa_ratings\" (\"name\", \"description\")" +
-                "VALUES (?, ?)";
+        String sqlQuery = "INSERT INTO mpa_ratings (name, description) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery,name, description);
     }
 
     public boolean deleteMpaRating(int id) {
-        String sqlQuery = "DELETE FROM \"mpa_ratings\"" +
-                "WHERE \"id\" = ?";
+        String sqlQuery = "DELETE FROM mpa_ratings WHERE id = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
     public boolean deleteAllMpaRatings() {
-        String sqlQuery = "DELETE FROM \"mpa_ratings\"";
+        String sqlQuery = "DELETE FROM mpa_ratings";
         return jdbcTemplate.update(sqlQuery) > 0;
     }
 
     public List<MpaRating> getAllMpaRatings() {
-        String sqlQuery = "SELECT * FROM \"mpa_ratings\"";
+        String sqlQuery = "SELECT * FROM mpa_ratings";
         return jdbcTemplate.query(sqlQuery, this::mapRowToMpaRating);
     }
 
     public MpaRating getMpaRatingById(int id) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"mpa_ratings\"" +
-                "WHERE \"id\" = ?";
+        String sqlQuery = "SELECT * FROM mpa_ratings WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, id);
         } catch (EmptyResultDataAccessException e) {
@@ -53,8 +50,7 @@ public class MpaRatingStorage {
     }
 
     public MpaRating updateMpaRating(MpaRating mpa) throws ExistenceException {
-        String sqlQuery = "SELECT * FROM \"mpa_ratings\"" +
-                "WHERE \"id\" = ?";
+        String sqlQuery = "SELECT * FROM mpa_ratings WHERE id = ?";
         try {
             jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, mpa.getId());
         } catch (EmptyResultDataAccessException e) {
@@ -62,7 +58,7 @@ public class MpaRatingStorage {
             throw new ExistenceException(errorMessage);
         }
 
-        sqlQuery = "UPDATE \"mpa_ratings\" SET \"name\" = ?, \"description\" = ? WHERE \"id\" = ?";
+        sqlQuery = "UPDATE mpa_ratings SET name = ?, description = ? WHERE id = ?";
         jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getDescription(), mpa.getId());
         return getMpaRatingById(mpa.getId());
     }

@@ -49,9 +49,9 @@ public class FilmDbStorageTests {
     @Test
     public void testCreateFilm() throws ValidationException, ExistenceException {
         Film film = Film.builder()
-                .name("Test film")
-                .description("Test description")
-                .releaseDate(LocalDate.parse("1990-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .name("Test film1")
+                .description("Test description1")
+                .releaseDate(LocalDate.parse("1991-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .duration(120)
                 .mpa(mpaStorage.getMpaRatingById(1))
                 .build();
@@ -107,8 +107,8 @@ public class FilmDbStorageTests {
         User createdUser = userDbStorage.createUser(user);
 
         Film film = Film.builder()
-                .name("Test film")
-                .description("Test description")
+                .name("Test film1")
+                .description("Test description1")
                 .releaseDate(LocalDate.parse("1990-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .duration(120)
                 .mpa(mpaStorage.getMpaRatingById(1))
