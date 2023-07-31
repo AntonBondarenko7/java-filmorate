@@ -21,7 +21,7 @@ public class FilmController extends AdviceController {
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() throws ExistenceException {
         return filmService.getAllFilms();
     }
 
@@ -31,21 +31,19 @@ public class FilmController extends AdviceController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) {
+    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) throws ExistenceException {
         return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
                 HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException {
-        filmService.createFilm(film);
-        return new ResponseEntity<>(film, HttpStatus.CREATED);
+    public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
+        return new ResponseEntity<>(filmService.createFilm(film), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<?> updateFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
-        filmService.updateFilm(film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+        return new ResponseEntity<>(filmService.updateFilm(film), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/like/{userId}")

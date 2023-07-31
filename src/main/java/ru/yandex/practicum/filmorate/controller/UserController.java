@@ -39,15 +39,13 @@ public class UserController extends AdviceController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) throws ValidationException {
-        userService.createUser(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    public ResponseEntity<?> createUser(@RequestBody User user) throws ValidationException, ExistenceException {
+        return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user) throws ValidationException, ExistenceException {
-        userService.updateUser(user);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userService.updateUser(user), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

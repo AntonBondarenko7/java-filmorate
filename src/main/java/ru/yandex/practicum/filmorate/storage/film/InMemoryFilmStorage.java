@@ -20,7 +20,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film createFilm(Film film) throws ValidationException {
         try {
             FilmValidator.validateFilm(film);
-            Integer filmId = generateId();
+            int filmId = generateId();
             film.setId(filmId);
             films.put(filmId, film);
             mostPopularFilms.add(film);
@@ -53,7 +53,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films;
     }
 
-    @Override
     public TreeSet<Film> getMostPopularFilms() {
         return mostPopularFilms;
     }

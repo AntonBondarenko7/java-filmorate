@@ -16,7 +16,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User createUser(User user) throws ValidationException {
         try {
             UserValidator.validateUser(user);
-            Integer userId = generateId();
+            int userId = generateId();
             user.setId(userId);
             users.put(userId, user);
             return user;
@@ -40,7 +40,6 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ExistenceException(errorMessage);
         }
     }
-
 
     @Override
     public int generateId() {
