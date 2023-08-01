@@ -106,6 +106,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new ExistenceException(errorMessage);
         }
     }
+
     @Override
     public List<Film> getMostPopularFilms(int count) throws ExistenceException {
 
