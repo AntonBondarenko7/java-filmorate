@@ -10,10 +10,6 @@ public interface UserStorage {
 
     User updateUser(User user) throws ValidationException, ExistenceException;
 
-    default int generateId() {
-        throw new UnsupportedOperationException("Метод не поддерживается");
-    }
-
     HashMap<Integer, User> getAllUsers();
 
     User getUserById(int userId) throws ValidationException, ExistenceException;
