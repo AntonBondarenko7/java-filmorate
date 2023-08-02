@@ -111,7 +111,8 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public void deleteUserById(int id) {
+    @Override
+    public void removeUserById(int id) {
         String sqlQuery = "DELETE FROM users WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }

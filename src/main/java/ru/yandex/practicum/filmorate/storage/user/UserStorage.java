@@ -13,4 +13,6 @@ public interface UserStorage {
     HashMap<Integer, User> getAllUsers();
 
     User getUserById(int userId) throws ValidationException, ExistenceException;
+
+    void removeUserById(int id);
 }

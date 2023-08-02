@@ -40,10 +40,13 @@ public class UserService {
 
     public ArrayList<User> getUserFriends(int userId) throws ValidationException, ExistenceException {
         ArrayList<User> friends = new ArrayList<>();
-        ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
-        for (Friendship f : friendships) {
-            User user = getUserById(f.getUser2Id());
-            friends.add(user);
+
+        if (getUserById(userId) != null) {
+            ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
+            for (Friendship f : friendships) {
+                User user = getUserById(f.getUser2Id());
+                friends.add(user);
+            }
         }
         return friends;
     }
@@ -77,5 +80,12 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         user.setFriends(getUserFriendsIds(userId));
         return user;
+    }
+
+    public void removeUserById(int id) throws ValidationException {
+        if (id <= 0) {
+            throw new ValidationException("id должен быть положительным");
+        }
+        userStorage.removeUserById(id);
     }
 }
