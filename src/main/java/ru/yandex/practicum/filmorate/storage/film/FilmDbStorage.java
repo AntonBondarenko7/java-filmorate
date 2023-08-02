@@ -107,6 +107,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
     public List<Film> getMostPopularFilms(int count) throws ExistenceException {
 
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
