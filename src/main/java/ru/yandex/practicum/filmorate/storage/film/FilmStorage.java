@@ -15,7 +15,7 @@ public interface FilmStorage {
 
     Film getFilmById(int filmId) throws ValidationException, ExistenceException;
 
-    List<Film> getMostPopularFilms(int count) throws ExistenceException;
+    List<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException;
 
     List<Film> getCommonFilms(int userId, int friendId);
 

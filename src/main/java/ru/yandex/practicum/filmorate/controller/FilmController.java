@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -31,9 +32,20 @@ public class FilmController extends AdviceController {
         return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/popular")
+/*    @GetMapping("/popular")
     public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) throws ExistenceException {
         return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
+                HttpStatus.OK);
+    }*/
+
+    @GetMapping("/popular")
+    public ResponseEntity<?> getMostPopularFilms(
+            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
+            @RequestParam(value = "genreId", defaultValue = "0", required = false) Integer genreId,
+            @RequestParam(value = "year", defaultValue = "0", required = false) Integer year
+    ) throws ExistenceException {
+
+        return new ResponseEntity<>(filmService.getMostPopularFilms(count, genreId, year),
                 HttpStatus.OK);
     }
 

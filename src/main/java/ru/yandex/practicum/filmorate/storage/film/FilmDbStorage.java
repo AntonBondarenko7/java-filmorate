@@ -10,10 +10,10 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -109,22 +109,86 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopularFilms(int count) throws ExistenceException {
-        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
-                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
-                "FROM films f\n" +
-                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
-                "LEFT JOIN likes l on f.id = l.film_id\n" +
-                "GROUP BY f.id\n" +
-                "ORDER BY COUNT(l.id) DESC\n" +
-                "LIMIT ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
-            try {
-                return mapRowToFilm(resultSet, rowNum);
-            } catch (ExistenceException e) {
-                throw new RuntimeException(e);
-            }
-        }, count);
+    public List<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
+        List<Film> filmExistList = new ArrayList<>();
+        //если нет ограничений по жанру и году
+        if (genreId == 0 && year == 0) {
+            String sqlQuery =
+                    "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                    "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                    "FROM films f\n" +
+                    "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                    "LEFT JOIN likes l on f.id = l.film_id\n" +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(l.id) DESC\n" +
+                    "LIMIT ?";
+            filmExistList = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, count);
+        } else if (genreId != 0 && year == 0) {
+            //если ограничение по жанру
+            String sqlQuery =
+                    "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                    "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                    "FROM films f\n" +
+                    "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                    "LEFT JOIN likes l on f.id = l.film_id\n" +
+                    "LEFT JOIN film_genres as FG on f.id = FG.FILM_ID\n" +
+                    "WHERE genre_id = ? \n" +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(l.id) DESC\n" +
+                    "LIMIT ?";
+            filmExistList = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, genreId, count);
+        } else if (genreId == 0 && year != 0) {
+        //если ограничение по году
+            String sqlQuery =
+                    "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                    "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                    "FROM films f\n" +
+                    "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                    "LEFT JOIN likes l on f.id = l.film_id\n" +
+                    "WHERE EXTRACT(YEAR FROM RELEASE_DATE) = ? \n" +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(l.id) DESC\n" +
+                    "LIMIT ?";
+            filmExistList = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, year, count);
+        } else {
+            String sqlQuery =
+                    "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                    "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                    "FROM films f\n" +
+                    "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                    "LEFT JOIN likes l on f.id = l.film_id\n" +
+                    "LEFT JOIN film_genres as FG on f.id = FG.FILM_ID\n" +
+                    "WHERE genre_id = ? AND EXTRACT(YEAR FROM RELEASE_DATE) = ?\n " +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(l.id) DESC\n" +
+                    "LIMIT ?";
+            filmExistList = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, genreId, year, count);
+        }
+        return filmExistList;
     }
 
     @Override
@@ -178,7 +242,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException {
-
         String sqlOrderBy = "";
         if (sortby.equals("likes"))
             sqlOrderBy = "COUNT(l.id) DESC";
