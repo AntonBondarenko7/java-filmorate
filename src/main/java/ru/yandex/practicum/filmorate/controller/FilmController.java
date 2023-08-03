@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -33,6 +34,12 @@ public class FilmController extends AdviceController {
     @GetMapping("/popular")
     public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) throws ExistenceException {
         return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public ResponseEntity<?> getFilmsDirectorSorted(@PathVariable Integer directorId, @RequestParam String sortBy) throws ExistenceException {
+        return new ResponseEntity<>(filmService.getFilmsDirectorSorted(directorId, sortBy),
                 HttpStatus.OK);
     }
 
