@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
+
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -27,5 +28,6 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
     private Set<Genre> genres;
+    private Set<Director> directors;
     private MpaRating mpa;
 }

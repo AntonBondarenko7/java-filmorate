@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -153,6 +154,32 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, id);
     }
 
+    @Override
+    public List<Film> getFilmsDirectorSorted(int director_id, String sortby) throws ExistenceException {
+
+        String sqlOrderBy = "";
+        if (sortby.equals("likes"))
+            sqlOrderBy = "COUNT(l.id) DESC";
+        else
+            sqlOrderBy = "release_date ";
+        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                "FROM films f\n" +
+                "INNER JOIN directors_films df ON df.film_id = f.id\n" +
+                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                "LEFT JOIN likes l on f.id = l.film_id\n" +
+                "WHERE df.director_id = ? \n" +
+                "GROUP BY f.id\n" +
+                "ORDER BY " + sqlOrderBy + ";";
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+            try {
+                return mapRowToFilm(resultSet, rowNum);
+            } catch (ExistenceException e) {
+                throw new RuntimeException(e);
+            }
+        }, director_id);
+    }
+
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {
         return Film.builder()
                 .id(resultSet.getInt("id"))
@@ -161,9 +188,9 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .mpa(MpaRating.builder().id(resultSet.getInt("mpa_rating_id"))
-                                        .name(resultSet.getString("MPA_NAME"))
-                                        .description(resultSet.getString("mpa_description"))
-                                        .build())
+                        .name(resultSet.getString("MPA_NAME"))
+                        .description(resultSet.getString("mpa_description"))
+                        .build())
                 .build();
     }
 }
