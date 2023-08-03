@@ -145,7 +145,7 @@ public class FilmDbStorageTests {
     @Test
     public void testDeleteFilmById() {
         int filmId = filmDbStorage.getAllFilms().keySet().stream().findFirst().get().intValue();
-        filmDbStorage.deleteFilmById(filmId);
+        filmDbStorage.removeFilmById(filmId);
         assertThrows(ExistenceException.class, () -> filmDbStorage.getFilmById(filmId));
     }
 }

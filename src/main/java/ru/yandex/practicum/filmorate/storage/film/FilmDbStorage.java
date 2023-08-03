@@ -38,7 +38,7 @@ public class FilmDbStorage implements FilmStorage {
                     film.getReleaseDate(),
                     film.getDuration(),
                     film.getMpa().getId());
-            return getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate());
+            return getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate(), film.getDuration());
         } catch (ValidationException | ExistenceException e) {
             throw new ValidationException(e.getMessage());
         }
@@ -87,12 +87,12 @@ public class FilmDbStorage implements FilmStorage {
         return filmMap;
     }
 
-    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate) throws ExistenceException {
+    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate, int duration) throws ExistenceException {
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
                 "FROM films f\n" +
                 "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
-                "WHERE f.name = ? AND f.release_date = ?";
+                "WHERE f.name = ? AND f.release_date = ? AND f.duration = ? ";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> {
                 try {
@@ -100,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
                 } catch (ExistenceException e) {
                     throw new RuntimeException(e);
                 }
-            }, name, releaseDate);
+            }, name, releaseDate, duration);
         } catch (EmptyResultDataAccessException e) {
             String errorMessage = "Фильма с такими данными нет в списке";
             throw new ExistenceException(errorMessage);
@@ -148,7 +148,8 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    public void deleteFilmById(int id) {
+    @Override
+    public void removeFilmById(int id) {
         String sqlQuery = "DELETE FROM films WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }

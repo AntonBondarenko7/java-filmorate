@@ -16,4 +16,6 @@ public interface FilmStorage {
     Film getFilmById(int filmId) throws ValidationException, ExistenceException;
 
     List<Film> getMostPopularFilms(int count) throws ExistenceException;
+
+    void removeFilmById(int id);
 }
