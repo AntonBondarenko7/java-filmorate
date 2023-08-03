@@ -45,8 +45,8 @@ public class FilmService {
         return films;
     }
 
-    public Collection<Film> getFilmsDirectorSorted(int director_id, String sortBy) throws ExistenceException {
-        Collection<Film> films = filmStorage.getFilmsDirectorSorted(director_id, sortBy);
+    public Collection<Film> getFilmsDirectorSorted(int directorId, String sortBy) throws ExistenceException {
+        Collection<Film> films = filmStorage.getFilmsDirectorSorted(directorId, sortBy);
         if (films.isEmpty())
             throw new ExistenceException("Фильмы не найдены");
         for (Film f : films) {
