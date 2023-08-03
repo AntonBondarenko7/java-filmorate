@@ -155,7 +155,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsDirectorSorted(int director_id, String sortby) throws ExistenceException {
+    public List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException {
 
         String sqlOrderBy = "";
         if (sortby.equals("likes"))
@@ -177,7 +177,7 @@ public class FilmDbStorage implements FilmStorage {
             } catch (ExistenceException e) {
                 throw new RuntimeException(e);
             }
-        }, director_id);
+        }, directorid);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {
