@@ -110,7 +110,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getMostPopularFilms(int count) throws ExistenceException {
-
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
                 "FROM films f\n" +
@@ -126,6 +125,28 @@ public class FilmDbStorage implements FilmStorage {
                 throw new RuntimeException(e);
             }
         }, count);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        String sqlQuery = "SELECT f.id AS film_id, f.name AS film_name, f.description AS film_description, " +
+                "f.release_date, f.duration, f.mpa_rating_id, \n" +
+                "mpa.name AS mpa_name, mpa.description AS mpa_description, \n" +
+                "COUNT(l.film_id) AS likes_count\n" +
+                "FROM films f\n" +
+                "INNER JOIN likes l ON f.id = l.film_id\n" +
+                "INNER JOIN mpa_ratings mpa ON f.mpa_rating_id = mpa.id\n" +
+                "WHERE l.user_id IN (?, ?)\n" +
+                "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, mpa.name, mpa.description\n" +
+                "HAVING COUNT(DISTINCT l.user_id) = ?\n" +
+                "ORDER BY likes_count DESC";
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+            try {
+                return mapRowToFilm(resultSet, rowNum);
+            } catch (ExistenceException e) {
+                throw new RuntimeException(e);
+            }
+        }, userId, friendId, friendId);
     }
 
     @Override

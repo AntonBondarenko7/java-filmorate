@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -113,5 +114,14 @@ public class FilmService {
             throw new ValidationException("id должен быть положительным");
         }
         filmStorage.removeFilmById(id);
+    }
+
+    public List<Film> getCommonFilms(int userId, int friendId) throws ExistenceException {
+        List<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        for (Film f: films) {
+            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
+            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
+        }
+        return films;
     }
 }
