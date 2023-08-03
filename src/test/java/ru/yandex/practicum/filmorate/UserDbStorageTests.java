@@ -106,7 +106,7 @@ public class UserDbStorageTests {
     @Test
     public void testDeleteUserById() {
         int userId = userStorage.getAllUsers().keySet().stream().findFirst().get().intValue();
-        userStorage.deleteUserById(userId);
+        userStorage.removeUserById(userId);
         assertThrows(ExistenceException.class, () -> userStorage.getUserById(userId));
     }
 }

@@ -66,4 +66,10 @@ public class FilmController extends AdviceController {
         filmService.removeLike(id, userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> removeFilmById(@PathVariable int id) throws ValidationException {
+        filmService.removeFilmById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

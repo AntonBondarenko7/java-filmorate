@@ -107,4 +107,11 @@ public class FilmService {
         updatedFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(updatedFilm.getId()));
         return updatedFilm;
     }
+
+    public void removeFilmById(int id) throws ValidationException {
+        if (id <= 0) {
+            throw new ValidationException("id должен быть положительным");
+        }
+        filmStorage.removeFilmById(id);
+    }
 }

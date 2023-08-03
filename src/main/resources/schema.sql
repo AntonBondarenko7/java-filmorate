@@ -109,22 +109,22 @@ VALUES ('Комедия'),
        ('Боевик');
 
 ALTER TABLE friendships ADD CONSTRAINT IF NOT EXISTS fk_friendships_user1_id FOREIGN KEY(user1_id)
-REFERENCES users (id);
+REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE friendships ADD CONSTRAINT IF NOT EXISTS fk_friendships_user2_id FOREIGN KEY(user2_id)
-REFERENCES users (id);
+REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE films ADD CONSTRAINT IF NOT EXISTS fk_film_mpa_rating_id FOREIGN KEY(mpa_rating_id)
 REFERENCES mpa_ratings (id);
 
 ALTER TABLE likes ADD CONSTRAINT IF NOT EXISTS fk_like_film_id FOREIGN KEY(film_id)
-REFERENCES films (id);
+REFERENCES films (id) ON DELETE CASCADE;
 
 ALTER TABLE likes ADD CONSTRAINT IF NOT EXISTS fk_like_user_id FOREIGN KEY(user_id)
-REFERENCES users (id);
+REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE film_genres ADD CONSTRAINT IF NOT EXISTS fk_film_genres_film_id FOREIGN KEY(film_id)
-REFERENCES films (id);
+REFERENCES films (id) ON DELETE CASCADE;
 
 ALTER TABLE film_genres ADD CONSTRAINT IF NOT EXISTS fk_film_genres_genre_id FOREIGN KEY(genre_id)
 REFERENCES genres (id);

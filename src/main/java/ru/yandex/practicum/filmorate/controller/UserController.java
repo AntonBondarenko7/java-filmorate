@@ -61,4 +61,10 @@ public class UserController extends AdviceController {
         userService.removeFriend(id, friendId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> removeUserById(@PathVariable int id) throws ValidationException {
+        userService.removeUserById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

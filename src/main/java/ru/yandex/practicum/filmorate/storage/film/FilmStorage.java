@@ -19,4 +19,6 @@ public interface FilmStorage {
     List<Film> getMostPopularFilms(int count) throws ExistenceException;
 
     List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException;
+
+    void removeFilmById(int id);
 }
