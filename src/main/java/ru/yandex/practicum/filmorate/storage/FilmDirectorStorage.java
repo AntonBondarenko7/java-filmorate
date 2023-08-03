@@ -27,10 +27,10 @@ public class FilmDirectorStorage {
         this.directorDbStorage = directorDbStorage;
     }
 
-    public void createFilmDirector(int filmId, int director_id) throws ExistenceException, ValidationException {
-        directorDbStorage.getDirectorById(director_id);
+    public void createFilmDirector(int filmId, int directorid) throws ExistenceException, ValidationException {
+        directorDbStorage.getDirectorById(directorid);
         String sqlQuery = "INSERT INTO directors_films (film_id, director_id) VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery, filmId, director_id);
+        jdbcTemplate.update(sqlQuery, filmId, directorid);
     }
 
     public boolean deleteAllFilmDirectorsByFilmId(int filmId) {
