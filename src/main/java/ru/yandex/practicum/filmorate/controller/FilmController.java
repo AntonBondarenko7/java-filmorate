@@ -46,17 +46,17 @@ public class FilmController extends AdviceController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/users/{id}/recommendations")
-    public ResponseEntity<?> getRecommendations(@PathVariable int id) throws ExistenceException {
-        return new ResponseEntity<>(filmService.getRecommendations(id),
-                HttpStatus.OK);
-    }
 
     @GetMapping("/films/common")
     public ResponseEntity<?> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) throws ExistenceException {
         return new ResponseEntity<>(filmService.getCommonFilms(userId, friendId), HttpStatus.OK);
     }
 
+    @GetMapping("/users/{id}/recommendations")
+    public ResponseEntity<?> getRecommendations(@PathVariable int id) throws ExistenceException {
+        return new ResponseEntity<>(filmService.getRecommendations(id),
+                HttpStatus.OK);
+    }
     @PostMapping("/films")
     public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
         return new ResponseEntity<>(filmService.createFilm(film), HttpStatus.CREATED);
