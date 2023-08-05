@@ -57,6 +57,7 @@ public class FilmController extends AdviceController {
         return new ResponseEntity<>(filmService.getRecommendations(id),
                 HttpStatus.OK);
     }
+
     @PostMapping("/films")
     public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
         return new ResponseEntity<>(filmService.createFilm(film), HttpStatus.CREATED);
