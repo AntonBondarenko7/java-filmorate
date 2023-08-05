@@ -22,4 +22,6 @@ public interface FilmStorage {
     List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException;
 
     void removeFilmById(int id);
+
+    List<Film> searchFilms(String query, String searchType);
 }
