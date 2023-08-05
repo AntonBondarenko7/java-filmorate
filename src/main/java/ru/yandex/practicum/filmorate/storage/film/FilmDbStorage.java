@@ -226,6 +226,8 @@ public class FilmDbStorage implements FilmStorage {
                 throw new RuntimeException(e);
             }
         }, userId, userId);
+    }
+
     public List<Film> searchFilms(String query, String searchType) {
         query = "%" + query + "%";
         String sqlQuery = "SELECT f.id, f.name, f.description, f.release_date, f.duration,\n" +
