@@ -126,6 +126,15 @@ public class FilmService {
         return films;
     }
 
+    public Collection<Film> getRecommendations(int userId) throws ExistenceException {
+        Collection<Film> films = filmStorage.getRecommendations(userId);
+        for (Film f : films) {
+            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
+            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
+        }
+        return films;
+    }
+
     public List<Film> searchFilms(String query, String searchType) throws ValidationException, ExistenceException {
         if (!searchType.equals("title") &&
                 !searchType.equals("director") &&
@@ -141,12 +150,5 @@ public class FilmService {
         return films;
     }
 
-    public Collection<Film> getRecommendations(int userId) throws ExistenceException {
-        Collection<Film> films = filmStorage.getRecommendations(userId);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
-        return films;
-    }
+
 }
