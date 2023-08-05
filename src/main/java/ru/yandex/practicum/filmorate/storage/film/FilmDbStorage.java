@@ -226,6 +226,53 @@ public class FilmDbStorage implements FilmStorage {
                 throw new RuntimeException(e);
             }
         }, userId, userId);
+    public List<Film> searchFilms(String query, String searchType) {
+        query = "%" + query + "%";
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.release_date, f.duration,\n" +
+                "f.mpa_rating_id, mpa.name AS mpa_name, mpa.description AS mpa_description,\n" +
+                "COUNT(l.film_id) AS likes_count\n" +
+                "FROM films f\n" +
+                "LEFT JOIN mpa_ratings mpa on f.mpa_rating_id = mpa.id\n" +
+                "LEFT JOIN likes l on f.id = l.film_id\n" +
+                "LEFT JOIN directors_films df on f.id = df.film_id\n" +
+                "LEFT JOIN directors d on df.director_id = d.director_id\n";
+        if (searchType.equals("title")) {
+            sqlQuery += "WHERE LOWER(f.name) like LOWER(?)\n" +
+                    "GROUP BY f.id, f.name, f.description, f.release_date, " +
+                    "f.duration, f.mpa_rating_id, mpa.name, mpa.description\n" +
+                    "ORDER BY likes_count DESC";
+            return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, query);
+        } else if (searchType.equals("director")) {
+            sqlQuery += "WHERE LOWER(d.name) like LOWER(?)\n" +
+                    "GROUP BY f.id, f.name, f.description, f.release_date, " +
+                    "f.duration, f.mpa_rating_id, mpa.name, mpa.description\n" +
+                    "ORDER BY likes_count DESC";
+            return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, query);
+        } else {
+            sqlQuery += "WHERE LOWER(f.name) like LOWER(?)\n" +
+                    "OR LOWER(d.name) like LOWER(?)\n" +
+                    "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, mpa.name, mpa.description\n" +
+                    "ORDER BY likes_count DESC";
+            return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+                try {
+                    return mapRowToFilm(resultSet, rowNum);
+                } catch (ExistenceException e) {
+                    throw new RuntimeException(e);
+                }
+            }, query, query);
+        }
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {

@@ -133,4 +133,19 @@ public class FilmService {
         }
         return films;
     }
+
+    public List<Film> searchFilms(String query, String searchType) throws ValidationException, ExistenceException {
+        if (!searchType.equals("title") &&
+                !searchType.equals("director") &&
+                !searchType.equals("director,title") &&
+                !searchType.equals("title,director")) {
+            throw new ValidationException("Некорректные параметры поиска");
+        }
+        List<Film> films = filmStorage.searchFilms(query, searchType);
+        for (Film f: films) {
+            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
+            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
+        }
+        return films;
+    }
 }
