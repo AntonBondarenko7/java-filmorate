@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -204,6 +205,29 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getRecommendations(int userId) {
+        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                "FROM FILMS F\n" +
+                "  LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                "  JOIN LIKES L ON L.film_id = F.id\n" +
+                "  JOIN (Select L1.user_id as userMaxSamples\n" + //юзеры с максимальным пересечением по лайкам. L2 - наш юзер, L1 - остальные
+                "        FROM LIKES L1 \n" +
+                "        JOIN LIKES L2 ON L1.film_id = L2.film_id AND L1.user_id <> L2.user_id AND L2.user_id = ?\n" +
+                "        GROUP BY L1.user_id\n" +
+                "        ORDER BY COUNT(*) DESC) as MS ON MS.userMaxSamples = L.user_id\n" +
+                "  LEFT JOIN LIKES L3 ON L3.film_id = L.film_id AND L3.user_id = ?\n" +
+                "WHERE L3.film_id IS NULL \n" + //находим только те фильмы, которые наш юзер не лайкал.
+                "LIMIT 10;";
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+            try {
+                return mapRowToFilm(resultSet, rowNum);
+            } catch (ExistenceException e) {
+                throw new RuntimeException(e);
+            }
+        }, userId, userId);
+    }
+
     public List<Film> searchFilms(String query, String searchType) {
         query = "%" + query + "%";
         String sqlQuery = "SELECT f.id, f.name, f.description, f.release_date, f.duration,\n" +
