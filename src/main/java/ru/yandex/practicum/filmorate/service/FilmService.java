@@ -46,6 +46,15 @@ public class FilmService {
         return films;
     }
 
+    public Collection<Film> getRecommendations(int userId) throws ExistenceException {
+        Collection<Film> films = filmStorage.getRecommendations(userId);
+        for (Film f : films) {
+            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
+            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
+        }
+        return films;
+    }
+
     public Collection<Film> getFilmsDirectorSorted(int directorId, String sortBy) throws ExistenceException {
         Collection<Film> films = filmStorage.getFilmsDirectorSorted(directorId, sortBy);
         if (films.isEmpty())
@@ -118,7 +127,7 @@ public class FilmService {
 
     public List<Film> getCommonFilms(int userId, int friendId) throws ExistenceException {
         List<Film> films = filmStorage.getCommonFilms(userId, friendId);
-        for (Film f: films) {
+        for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
             f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
