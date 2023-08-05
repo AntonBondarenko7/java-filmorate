@@ -52,6 +52,12 @@ public class FilmController extends AdviceController {
         return new ResponseEntity<>(filmService.getCommonFilms(userId, friendId), HttpStatus.OK);
     }
 
+    @GetMapping("/films/search")
+    public ResponseEntity<?> searchFilms(@RequestParam String query, @RequestParam String by)
+            throws ValidationException, ExistenceException {
+        return new ResponseEntity<>(filmService.searchFilms(query, by), HttpStatus.OK);
+    }
+
     @GetMapping("/users/{id}/recommendations")
     public ResponseEntity<?> getRecommendations(@PathVariable int id) throws ExistenceException {
         return new ResponseEntity<>(filmService.getRecommendations(id),

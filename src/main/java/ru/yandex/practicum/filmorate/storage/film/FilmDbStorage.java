@@ -205,6 +205,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+
     public List<Film> getRecommendations(int userId) {
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
@@ -227,6 +228,7 @@ public class FilmDbStorage implements FilmStorage {
             }
         }, userId, userId);
     }
+
 
     public List<Film> searchFilms(String query, String searchType) {
         query = "%" + query + "%";
