@@ -37,8 +37,8 @@ public class FilmService {
         likeStorage.deleteLike(userId, filmId);
     }
 
-    public Collection<Film> getMostPopularFilms(int count) throws ExistenceException {
-        Collection<Film> films = filmStorage.getMostPopularFilms(count);
+    public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
+        Collection<Film> films = filmStorage.getMostPopularFilms(count, genreId, year);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
             f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));

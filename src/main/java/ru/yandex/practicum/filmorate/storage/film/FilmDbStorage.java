@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -109,22 +108,25 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopularFilms(int count) throws ExistenceException {
-        String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
-                "mr.name AS mpa_name, mr.description AS mpa_description\n" +
-                "FROM films f\n" +
-                "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
-                "LEFT JOIN likes l on f.id = l.film_id\n" +
-                "GROUP BY f.id\n" +
-                "ORDER BY COUNT(l.id) DESC\n" +
-                "LIMIT ?";
+    public List<Film> getMostPopularFilms(int count, int genreId, int year) {
+        String sqlQuery =
+                "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
+                        "mr.name AS mpa_name, mr.description AS mpa_description\n" +
+                        "FROM films f\n" +
+                        "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_rating_id\n" +
+                        "LEFT JOIN likes l on f.id = l.film_id\n" +
+                        "LEFT JOIN film_genres as FG on f.id = FG.FILM_ID\n" +
+                        "WHERE (genre_id = ? OR ? = 0) AND (EXTRACT(YEAR FROM RELEASE_DATE) = ? OR ? = 0)\n" +
+                        "GROUP BY f.id\n" +
+                        "ORDER BY COUNT(l.id) DESC\n" +
+                        "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
             try {
                 return mapRowToFilm(resultSet, rowNum);
             } catch (ExistenceException e) {
                 throw new RuntimeException(e);
             }
-        }, count);
+        }, genreId, genreId, year, year, count);
     }
 
     @Override
@@ -178,7 +180,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException {
-
         String sqlOrderBy = "";
         if (sortby.equals("likes"))
             sqlOrderBy = "COUNT(l.id) DESC";

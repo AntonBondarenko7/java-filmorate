@@ -116,7 +116,7 @@ public class FilmDbStorageTests {
 
         Film createdFilm = filmDbStorage.createFilm(film);
         likeStorage.createLike(createdUser.getId(), createdFilm.getId());
-        List<Film> popFilms = filmDbStorage.getMostPopularFilms(10);
+        List<Film> popFilms = filmDbStorage.getMostPopularFilms(10, 0, 0);
 
         assertEquals(createdFilm.getId(), popFilms.get(0).getId());
     }
