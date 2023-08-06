@@ -70,6 +70,7 @@ public class UserController extends AdviceController {
         userService.removeUserById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @GetMapping("/{id}/recommendations")
     public ResponseEntity<?> getRecommendations(@PathVariable int id) throws ExistenceException {
         return new ResponseEntity<>(filmService.getRecommendations(id),
