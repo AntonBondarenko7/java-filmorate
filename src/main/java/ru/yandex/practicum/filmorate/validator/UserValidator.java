@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.validator;
 
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
-import org.springframework.util.StringUtils;
 
 public class UserValidator {
     public UserValidator() {
@@ -11,12 +12,12 @@ public class UserValidator {
 
     public static void validateUser(User user) throws ValidationException {
 
-            checkEmail(user.getEmail());
-            checkLogin(user.getLogin());
-            checkBirthday(user.getBirthday());
-            if (checkName(user.getName())) {
-                user.setName(user.getLogin());
-            }
+        checkEmail(user.getEmail());
+        checkLogin(user.getLogin());
+        checkBirthday(user.getBirthday());
+        if (checkName(user.getName())) {
+            user.setName(user.getLogin());
+        }
     }
 
     public static void checkEmail(String email) throws ValidationException {
@@ -36,8 +37,8 @@ public class UserValidator {
     }
 
     public static void checkBirthday(LocalDate birthday) throws ValidationException {
-            if (birthday.isAfter(LocalDate.now())) {
-                throw new ValidationException("Дата рождения не может быть в будущем");
-            }
+        if (birthday.isAfter(LocalDate.now())) {
+            throw new ValidationException("Дата рождения не может быть в будущем");
         }
     }
+}

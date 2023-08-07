@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -30,4 +31,9 @@ public class Film {
     private Set<Genre> genres;
     private Set<Director> directors;
     private MpaRating mpa;
+    private Set<Review> reviews = new LinkedHashSet<>();
+
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
 }
