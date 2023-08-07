@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
@@ -24,6 +25,7 @@ public class FilmService {
     private final LikeStorage likeStorage;
     private final FilmGenreStorage filmGenreStorage;
     private final FilmDirectorStorage filmDirectorStorage;
+    private final ReviewStorage reviewStorage;
 
     public void addLike(int filmId, int userId) throws ValidationException, ExistenceException {
         userStorage.getUserById(userId);
@@ -43,6 +45,7 @@ public class FilmService {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
             f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
+        reviewStorage.loadReviews(films);
         return films;
     }
 
@@ -55,6 +58,7 @@ public class FilmService {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
             f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
+        reviewStorage.loadReviews(films);
         return films;
     }
 
@@ -64,6 +68,7 @@ public class FilmService {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
             f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
+        reviewStorage.loadReviews(films);
         return films;
     }
 
@@ -71,6 +76,8 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         film.setGenres(filmGenreStorage.getFilmGenresByFilmId(filmId));
         film.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(filmId));
+        Collection<Film> films = List.of(film);
+        reviewStorage.loadReviews(films);
         return film;
     }
 
@@ -123,6 +130,7 @@ public class FilmService {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
             f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
+        reviewStorage.loadReviews(films);
         return films;
     }
 

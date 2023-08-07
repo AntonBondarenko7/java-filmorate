@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class FilmGenreStorage {
 
     public boolean deleteAllFilmGenresByFilmId(int filmId) {
         String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?";
-        return jdbcTemplate.update(sqlQuery,filmId) > 0;
+        return jdbcTemplate.update(sqlQuery, filmId) > 0;
     }
 
     public Set<Genre> getFilmGenresByFilmId(int filmId) throws ExistenceException {

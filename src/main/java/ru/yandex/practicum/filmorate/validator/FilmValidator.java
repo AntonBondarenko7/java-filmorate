@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.validator;
 
 
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,10 +20,10 @@ public class FilmValidator {
     }
 
     public static void validateFilm(Film film) throws ValidationException {
-            checkFilmName(film.getName());
-            checkDescription(film.getDescription());
-            checkReleaseDate(film.getReleaseDate());
-            checkDuration(film.getDuration());
+        checkFilmName(film.getName());
+        checkDescription(film.getDescription());
+        checkReleaseDate(film.getReleaseDate());
+        checkDuration(film.getDuration());
     }
 
     public static void checkFilmName(String name) throws ValidationException {

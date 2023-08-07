@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -70,7 +71,7 @@ public class UserService {
 
     public Collection<User> getAllUsers() {
         Collection<User> users = userStorage.getAllUsers().values();
-        for (User u: users) {
+        for (User u : users) {
             u.setFriends(getUserFriendsIds(u.getId()));
         }
         return users;

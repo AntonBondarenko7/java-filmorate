@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class MpaRatingStorage {
 
     public void createMpaRating(String name, String description) {
         String sqlQuery = "INSERT INTO mpa_ratings (name, description) VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery,name, description);
+        jdbcTemplate.update(sqlQuery, name, description);
     }
 
     public boolean deleteMpaRating(int id) {
