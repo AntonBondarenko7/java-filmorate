@@ -31,7 +31,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeReviewById(@PathVariable int id) throws ValidationException {
+    public ResponseEntity<?> removeReviewById(@PathVariable int id) throws ValidationException, ExistenceException {
         reviewService.removeReviewById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -44,20 +44,20 @@ public class ReviewController {
     @GetMapping
     public List<Review> getAllReviews(
             @RequestParam(value = "filmId", required = false) Integer filmId,
-            @RequestParam(value = "count", defaultValue = "10") int count) throws ExistenceException {
+            @RequestParam(value = "count", defaultValue = "10") int count) {
         return reviewService.getAllReviews(filmId, count);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<?> putLike(@PathVariable int id,
-                                     @PathVariable int userId) throws ValidationException, ExistenceException {
+                                     @PathVariable int userId) throws ValidationException {
         reviewService.putLike(id, userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public ResponseEntity<?> putDislike(@PathVariable int id,
-                                        @PathVariable int userId) throws ValidationException, ExistenceException {
+                                        @PathVariable int userId) throws ValidationException {
         reviewService.putDislike(id, userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
