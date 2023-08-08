@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class GenreStorage {
 
     public void createGenre(String name) {
         String sqlQuery = "INSERT INTO genres (name) VALUES (?)";
-        jdbcTemplate.update(sqlQuery,name);
+        jdbcTemplate.update(sqlQuery, name);
     }
 
     public boolean deleteGenre(int id) {

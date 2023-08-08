@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +26,7 @@ public class MpaRatingStorageTests {
 
     @BeforeEach
     void seUp() {
-         mpaRatingStorage.deleteAllMpaRatings();
+        mpaRatingStorage.deleteAllMpaRatings();
     }
 
     @Test
@@ -104,9 +105,9 @@ public class MpaRatingStorageTests {
         String updatedDescription = "Updated Test description";
 
         MpaRating mpaRatingToUpdate = MpaRating.builder()
-                                            .id(mpaId)
-                                            .name(updatedName)
-                                            .description(updatedDescription).build();
+                .id(mpaId)
+                .name(updatedName)
+                .description(updatedDescription).build();
 
         MpaRating updatedMpaRating = mpaRatingStorage.updateMpaRating(mpaRatingToUpdate);
 
