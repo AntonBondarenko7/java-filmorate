@@ -7,12 +7,14 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventOperation;
+import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -24,17 +26,32 @@ public class FilmService {
     private final LikeStorage likeStorage;
     private final FilmGenreStorage filmGenreStorage;
     private final FilmDirectorStorage filmDirectorStorage;
+    private final EventService eventService;
 
     public void addLike(int filmId, int userId) throws ValidationException, ExistenceException {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.createLike(userId, filmId);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                userId,
+                EventType.LIKE,
+                EventOperation.ADD,
+                filmId));
     }
 
     public void removeLike(int filmId, int userId) throws ValidationException, ExistenceException {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.deleteLike(userId, filmId);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                userId,
+                EventType.LIKE,
+                EventOperation.REMOVE,
+                filmId));
     }
 
     public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
