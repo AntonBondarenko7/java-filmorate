@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.EventService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.Collection;
 
@@ -18,6 +19,7 @@ import java.util.Collection;
 public class UserController extends AdviceController {
     private final UserService userService;
     private final EventService eventService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<User> getAllUsers() {
@@ -74,4 +76,11 @@ public class UserController extends AdviceController {
     public ResponseEntity<?> getUserEvent(@PathVariable int id) {
         return new ResponseEntity<>(eventService.getUserEvent(id), HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/recommendations")
+    public ResponseEntity<?> getRecommendations(@PathVariable int id) throws ExistenceException {
+        return new ResponseEntity<>(filmService.getRecommendations(id),
+                HttpStatus.OK);
+    }
+
 }

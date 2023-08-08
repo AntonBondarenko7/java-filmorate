@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
 import java.util.Collection;
 
 @Component
@@ -19,7 +20,7 @@ import java.util.Collection;
 public class FilmController extends AdviceController {
     private final FilmService filmService;
 
-    @GetMapping
+    @GetMapping()
     public Collection<Film> getAllFilms() throws ExistenceException {
         return filmService.getAllFilms();
     }
@@ -29,22 +30,16 @@ public class FilmController extends AdviceController {
         return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
     }
 
-/*    @GetMapping("/popular")
-    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) throws ExistenceException {
-        return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
-                HttpStatus.OK);
-    }*/
-
     @GetMapping("/popular")
     public ResponseEntity<?> getMostPopularFilms(
             @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
             @RequestParam(value = "genreId", defaultValue = "0", required = false) Integer genreId,
             @RequestParam(value = "year", defaultValue = "0", required = false) Integer year
     ) throws ExistenceException {
-
         return new ResponseEntity<>(filmService.getMostPopularFilms(count, genreId, year),
                 HttpStatus.OK);
     }
+
 
     @GetMapping("/director/{directorId}")
     public ResponseEntity<?> getFilmsDirectorSorted(@PathVariable Integer directorId, @RequestParam String sortBy) throws ExistenceException {
@@ -52,17 +47,25 @@ public class FilmController extends AdviceController {
                 HttpStatus.OK);
     }
 
+
     @GetMapping("/common")
     public ResponseEntity<?> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) throws ExistenceException {
         return new ResponseEntity<>(filmService.getCommonFilms(userId, friendId), HttpStatus.OK);
     }
 
-    @PostMapping
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchFilms(@RequestParam String query, @RequestParam String by)
+            throws ValidationException, ExistenceException {
+        return new ResponseEntity<>(filmService.searchFilms(query, by), HttpStatus.OK);
+    }
+
+    @PostMapping()
     public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
         return new ResponseEntity<>(filmService.createFilm(film), HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping()
     public ResponseEntity<?> updateFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
         return new ResponseEntity<>(filmService.updateFilm(film), HttpStatus.OK);
     }

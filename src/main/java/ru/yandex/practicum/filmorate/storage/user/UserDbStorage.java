@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -31,13 +32,13 @@ public class UserDbStorage implements UserStorage {
         try {
             UserValidator.validateUser(user);
             String sqlQuery = "INSERT INTO users(email, login, name, birthday) " +
-                              "VALUES (?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(sqlQuery,
 //                                userId,
-                                user.getEmail(),
-                                user.getLogin(),
-                                user.getName(),
-                                user.getBirthday());
+                    user.getEmail(),
+                    user.getLogin(),
+                    user.getName(),
+                    user.getBirthday());
             return getUserByLoginAndEmail(user.getLogin(), user.getEmail());
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
