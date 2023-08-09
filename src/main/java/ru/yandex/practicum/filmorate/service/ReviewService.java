@@ -27,10 +27,10 @@ public class ReviewService {
         eventService.addEvent(new Event(
                 0,
                 System.currentTimeMillis(),
-                review.getUserId(),
+                toReturn.getUserId(),
                 EventType.REVIEW,
                 EventOperation.ADD,
-                review.getFilmId()));
+                toReturn.getReviewId()));
         return toReturn;
     }
 
@@ -42,10 +42,10 @@ public class ReviewService {
         eventService.addEvent(new Event(
                 0,
                 System.currentTimeMillis(),
-                review.getUserId(),
+                toReturn.getUserId(),
                 EventType.REVIEW,
                 EventOperation.UPDATE,
-                review.getFilmId()));
+                toReturn.getReviewId()));
         return toReturn;
     }
 
@@ -71,8 +71,7 @@ public class ReviewService {
 
     public Review getReviewById(int id) throws ValidationException, ExistenceException {
         checkId(id);
-        Review review = reviewStorage.getReviewById(id);
-        return review;
+        return reviewStorage.getReviewById(id);
     }
 
     public List<Review> getAllReviews(Integer filmId, int count) {
@@ -89,51 +88,23 @@ public class ReviewService {
         checkId(id);
         checkId(userId);
         reviewStorage.putLike(id, userId);
-        eventService.addEvent(new Event(
-                0,
-                System.currentTimeMillis(),
-                userId,
-                EventType.LIKE,
-                EventOperation.ADD,
-                id));
     }
 
     public void putDislike(int id, int userId) throws ValidationException {
         checkId(id);
         checkId(userId);
         reviewStorage.putDislike(id, userId);
-        /*eventService.addEvent(new Event(
-                0,
-                System.currentTimeMillis(),
-                userId,
-                EventType.DISLIKE,
-                EventOperation.ADD,
-                id));*/
     }
 
     public void removeLike(int id, int userId) throws ValidationException {
         checkId(id);
         checkId(userId);
         reviewStorage.removeLike(id, userId);
-        eventService.addEvent(new Event(
-                0,
-                System.currentTimeMillis(),
-                userId,
-                EventType.LIKE,
-                EventOperation.REMOVE,
-                id));
     }
 
     public void removeDislike(int id, int userId) throws ValidationException {
         checkId(id);
         checkId(userId);
         reviewStorage.removeDislike(id, userId);
-        /*eventService.addEvent(new Event(
-                0,
-                System.currentTimeMillis(),
-                userId,
-                EventType.DISLIKE,
-                EventOperation.REMOVE,
-                id));*/
     }
 }

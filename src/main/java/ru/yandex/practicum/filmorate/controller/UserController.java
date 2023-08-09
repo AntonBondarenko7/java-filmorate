@@ -73,7 +73,9 @@ public class UserController extends AdviceController {
     }
 
     @GetMapping("/{id}/feed")
-    public ResponseEntity<?> getUserEvent(@PathVariable int id) {
+    public ResponseEntity<?> getUserEvent(@PathVariable int id) throws ValidationException, ExistenceException {
+        //валидация юзера
+        userService.getUserById(id);
         return new ResponseEntity<>(eventService.getUserEvent(id), HttpStatus.OK);
     }
 
