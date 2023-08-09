@@ -6,6 +6,9 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventOperation;
+import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -17,17 +20,32 @@ import java.util.Collection;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendshipStorage friendshipStorage;
+    private final EventService eventService;
 
     public void addFriend(int id, int friendId) throws ValidationException, ExistenceException {
         userStorage.getUserById(id);
         userStorage.getUserById(friendId);
         friendshipStorage.createFriendship(id, friendId);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                id,
+                EventType.FRIEND,
+                EventOperation.ADD,
+                friendId));
     }
 
     public void removeFriend(int id, int friendId) throws ValidationException, ExistenceException {
         userStorage.getUserById(id);
         userStorage.getUserById(friendId);
         friendshipStorage.deleteFriendship(id, friendId);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                id,
+                EventType.FRIEND,
+                EventOperation.REMOVE,
+                friendId));
     }
 
     public ArrayList<User> getCommonFriends(int id, int friendId) throws ValidationException, ExistenceException {

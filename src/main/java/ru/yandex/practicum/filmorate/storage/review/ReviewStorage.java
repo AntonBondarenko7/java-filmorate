@@ -13,7 +13,7 @@ public interface ReviewStorage {
 
     Review updateReview(Review review) throws ExistenceException;
 
-    void removeReviewById(int id);
+    Review removeReviewById(int id) throws ExistenceException;
 
     Review getReviewById(int id) throws ExistenceException;
 

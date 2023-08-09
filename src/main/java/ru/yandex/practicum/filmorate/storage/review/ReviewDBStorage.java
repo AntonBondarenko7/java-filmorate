@@ -63,9 +63,11 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public void removeReviewById(int id) {
+    public Review removeReviewById(int id) throws ExistenceException {
+        Review toReturn = getReviewById(id);
         String sql = "DELETE FROM reviews WHERE id = ?";
         jdbcTemplate.update(sql, id);
+        return toReturn;
     }
 
     @Override

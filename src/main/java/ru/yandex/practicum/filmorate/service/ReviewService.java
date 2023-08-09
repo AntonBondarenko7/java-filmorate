@@ -6,6 +6,9 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventOperation;
+import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
 import java.util.List;
@@ -15,23 +18,47 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
+    private final EventService eventService;
 
     public Review createReview(Review review) throws ValidationException {
         checkId(review.getFilmId());
         checkId(review.getUserId());
-        return reviewStorage.createReview(review);
+        Review toReturn = reviewStorage.createReview(review);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                toReturn.getUserId(),
+                EventType.REVIEW,
+                EventOperation.ADD,
+                toReturn.getReviewId()));
+        return toReturn;
     }
 
     public Review updateReview(Review review) throws ValidationException, ExistenceException {
         checkId(review.getReviewId());
         checkId(review.getFilmId());
         checkId(review.getUserId());
-        return reviewStorage.updateReview(review);
+        Review toReturn = reviewStorage.updateReview(review);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                toReturn.getUserId(),
+                EventType.REVIEW,
+                EventOperation.UPDATE,
+                toReturn.getReviewId()));
+        return toReturn;
     }
 
-    public void removeReviewById(int id) throws ValidationException {
+    public void removeReviewById(int id) throws ValidationException, ExistenceException {
         checkId(id);
-        reviewStorage.removeReviewById(id);
+        Review review = reviewStorage.removeReviewById(id);
+        eventService.addEvent(new Event(
+                id,
+                System.currentTimeMillis(),
+                review.getUserId(),
+                EventType.REVIEW,
+                EventOperation.REMOVE,
+                review.getFilmId()));
     }
 
     private void checkId(Integer id) throws NotFoundException, ValidationException {
@@ -44,8 +71,7 @@ public class ReviewService {
 
     public Review getReviewById(int id) throws ValidationException, ExistenceException {
         checkId(id);
-        Review review = reviewStorage.getReviewById(id);
-        return review;
+        return reviewStorage.getReviewById(id);
     }
 
     public List<Review> getAllReviews(Integer filmId, int count) {

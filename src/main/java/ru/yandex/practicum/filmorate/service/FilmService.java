@@ -7,6 +7,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventOperation;
+import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
@@ -26,17 +29,32 @@ public class FilmService {
     private final FilmGenreStorage filmGenreStorage;
     private final FilmDirectorStorage filmDirectorStorage;
     private final ReviewStorage reviewStorage;
+    private final EventService eventService;
 
     public void addLike(int filmId, int userId) throws ValidationException, ExistenceException {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.createLike(userId, filmId);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                userId,
+                EventType.LIKE,
+                EventOperation.ADD,
+                filmId));
     }
 
     public void removeLike(int filmId, int userId) throws ValidationException, ExistenceException {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.deleteLike(userId, filmId);
+        eventService.addEvent(new Event(
+                0,
+                System.currentTimeMillis(),
+                userId,
+                EventType.LIKE,
+                EventOperation.REMOVE,
+                filmId));
     }
 
     public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
@@ -157,6 +175,4 @@ public class FilmService {
         }
         return films;
     }
-
-
 }

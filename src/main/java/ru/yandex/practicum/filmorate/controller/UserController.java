@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
-
 import java.util.Collection;
 
 @RequiredArgsConstructor
@@ -18,6 +18,7 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController extends AdviceController {
     private final UserService userService;
+    private final EventService eventService;
     private final FilmService filmService;
 
     @GetMapping
@@ -69,6 +70,13 @@ public class UserController extends AdviceController {
     public ResponseEntity<?> removeUserById(@PathVariable int id) throws ValidationException {
         userService.removeUserById(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/feed")
+    public ResponseEntity<?> getUserEvent(@PathVariable int id) throws ValidationException, ExistenceException {
+        //валидация юзера
+        userService.getUserById(id);
+        return new ResponseEntity<>(eventService.getUserEvent(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/recommendations")
