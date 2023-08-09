@@ -18,11 +18,11 @@ import java.util.Set;
 @Builder
 public class Film {
 
+    private final Set<Review> reviews = new LinkedHashSet<>();
     private int id;
     private String name;
     private String description;
     private Set<Integer> likes;
-
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -31,9 +31,12 @@ public class Film {
     private Set<Genre> genres;
     private Set<Director> directors;
     private MpaRating mpa;
-    private final Set<Review> reviews = new LinkedHashSet<>();
 
     public void addReview(Review review) {
         reviews.add(review);
+    }
+
+    public void addDirector(Director director) {
+        directors.add(director);
     }
 }
