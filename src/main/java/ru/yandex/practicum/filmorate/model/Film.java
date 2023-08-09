@@ -31,7 +31,7 @@ public class Film {
     private Set<Genre> genres;
     private Set<Director> directors;
     private MpaRating mpa;
-    private Set<Review> reviews = new LinkedHashSet<>();
+    private final Set<Review> reviews = new LinkedHashSet<>();
 
     public void addReview(Review review) {
         reviews.add(review);
