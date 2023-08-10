@@ -12,9 +12,9 @@ import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,20 +49,20 @@ public class UserService {
                 friendId));
     }
 
-    public ArrayList<User> getCommonFriends(int id, int friendId) throws ValidationException, ExistenceException {
-        ArrayList<User> commonFriends = new ArrayList<>();
-        ArrayList<Integer> commonFriendsIds = new ArrayList<>(friendshipStorage.getCommonFriendIds(id, friendId));
+    public List<User> getCommonFriends(int id, int friendId) throws ValidationException, ExistenceException {
+        List<User> commonFriends = new ArrayList<>();
+        List<Integer> commonFriendsIds = new ArrayList<>(friendshipStorage.getCommonFriendIds(id, friendId));
         for (Integer i : commonFriendsIds) {
             commonFriends.add(userStorage.getUserById(i));
         }
         return commonFriends;
     }
 
-    public ArrayList<User> getUserFriends(int userId) throws ValidationException, ExistenceException {
-        ArrayList<User> friends = new ArrayList<>();
+    public List<User> getUserFriends(int userId) throws ValidationException, ExistenceException {
+        List<User> friends = new ArrayList<>();
 
         if (getUserById(userId) != null) {
-            ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
+            List<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
             for (Friendship f : friendships) {
                 User user = getUserById(f.getUser2Id());
                 friends.add(user);
@@ -71,9 +71,9 @@ public class UserService {
         return friends;
     }
 
-    private ArrayList<Integer> getUserFriendsIds(int userId) {
-        ArrayList<Integer> friends = new ArrayList<>();
-        ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
+    private List<Integer> getUserFriendsIds(int userId) {
+        List<Integer> friends = new ArrayList<>();
+        List<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
         for (Friendship f : friendships) {
             friends.add(f.getUser2Id());
         }

@@ -3,12 +3,17 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
@@ -27,9 +32,9 @@ public class FilmController extends AdviceController {
 
     @GetMapping("/popular")
     public Collection<Film> getMostPopularFilms(
-            @RequestParam(value = "count", defaultValue = "10") Integer count,
-            @RequestParam(value = "genreId", defaultValue = "0") Integer genreId,
-            @RequestParam(value = "year", defaultValue = "0") Integer year
+            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
+            @RequestParam(value = "genreId", defaultValue = "0") @Positive Integer genreId,
+            @RequestParam(value = "year", defaultValue = "0") @Min(1895) Integer year
     ) {
         return filmService.getMostPopularFilms(count, genreId, year);
     }
@@ -52,7 +57,7 @@ public class FilmController extends AdviceController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public Film createFilm(@RequestBody Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) {
         return filmService.createFilm(film);
     }
 
