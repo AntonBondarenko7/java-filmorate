@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
@@ -19,7 +19,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikeStorage likeStorage;
-    private final FilmGenreStorage filmGenreStorage;
+    private final FilmGenreDBStorage filmGenreStorage;
     private final FilmDirectorStorage filmDirectorStorage;
     private final ReviewStorage reviewStorage;
     private final EventService eventService;
@@ -61,9 +63,7 @@ public class FilmService {
     public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
         Collection<Film> films = filmStorage.getMostPopularFilms(count, genreId, year);
         filmDirectorStorage.loadDirectors(films);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-        }
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
@@ -74,9 +74,7 @@ public class FilmService {
         if (films.isEmpty())
             throw new ExistenceException("Фильмы не найдены");
         filmDirectorStorage.loadDirectors(films);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-        }
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
@@ -84,18 +82,16 @@ public class FilmService {
     public Collection<Film> getAllFilms() throws ExistenceException {
         Collection<Film> films = filmStorage.getAllFilms().values();
         filmDirectorStorage.loadDirectors(films);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-        }
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
 
     public Film getFilmById(int filmId) throws ValidationException, ExistenceException {
         Film film = filmStorage.getFilmById(filmId);
-        film.setGenres(filmGenreStorage.getFilmGenresByFilmId(filmId));
         film.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(filmId));
         Collection<Film> films = List.of(film);
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return film;
     }
@@ -104,42 +100,42 @@ public class FilmService {
         try {
             FilmValidator.validateFilm(film);
             Film createdFilm = filmStorage.createFilm(film);
-            if (film.getGenres() != null) {
-                for (Genre g : film.getGenres()) {
-                    filmGenreStorage.createFilmGenre(createdFilm.getId(), g.getId());
-                }
-            }
-            createdFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(createdFilm.getId()));
+
             if (film.getDirectors() != null) {
                 for (Director d : film.getDirectors()) {
                     filmDirectorStorage.createFilmDirector(createdFilm.getId(), d.getId());
                 }
             }
             createdFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(createdFilm.getId()));
-            return createdFilm;
+            return setFilmGenres(createdFilm);
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
     }
 
+    private Film setFilmGenres(Film film) {
+        if (film.getGenres() != null) {
+            filmGenreStorage.updateGenresForFilm(film);
+
+            film.getGenres().clear();
+            Collection<Film> films = List.of(film);
+            filmGenreStorage.loadGenres(films);
+        }
+        return film;
+    }
+
     public Film updateFilm(Film film) throws ValidationException, ExistenceException {
         try {
-            filmGenreStorage.deleteAllFilmGenresByFilmId(film.getId());
             filmDirectorStorage.deleteAllFilmDirectorsByFilmId(film.getId());
-            if (film.getGenres() != null) {
-                for (Genre g : film.getGenres()) {
-                    filmGenreStorage.createFilmGenre(film.getId(), g.getId());
-                }
-            }
+            Film updatedFilm = filmStorage.updateFilm(film);
+
             if (film.getDirectors() != null) {
                 for (Director d : film.getDirectors()) {
                     filmDirectorStorage.createFilmDirector(film.getId(), d.getId());
                 }
             }
-            Film updatedFilm = filmStorage.updateFilm(film);
-            updatedFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(updatedFilm.getId()));
             updatedFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(updatedFilm.getId()));
-            return updatedFilm;
+            return setFilmGenres(updatedFilm);
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
@@ -155,9 +151,7 @@ public class FilmService {
     public List<Film> getCommonFilms(int userId, int friendId) throws ExistenceException {
         List<Film> films = filmStorage.getCommonFilms(userId, friendId);
         filmDirectorStorage.loadDirectors(films);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-        }
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
@@ -165,9 +159,8 @@ public class FilmService {
     public Collection<Film> getRecommendations(int userId) throws ExistenceException {
         Collection<Film> films = filmStorage.getRecommendations(userId);
         filmDirectorStorage.loadDirectors(films);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-        }
+        filmGenreStorage.loadGenres(films);
+        reviewStorage.loadReviews(films);
         return films;
     }
 
@@ -180,9 +173,8 @@ public class FilmService {
         }
         List<Film> films = filmStorage.searchFilms(query, searchType);
         filmDirectorStorage.loadDirectors(films);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-        }
+        filmGenreStorage.loadGenres(films);
+        reviewStorage.loadReviews(films);
         return films;
     }
 }

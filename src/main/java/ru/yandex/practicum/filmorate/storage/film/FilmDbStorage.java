@@ -34,9 +34,11 @@ public class FilmDbStorage implements FilmStorage {
                     film.getReleaseDate(),
                     film.getDuration(),
                     film.getMpa().getId());
-            return getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate(), film.getDuration());
-        } catch (ExistenceException e) {
-            throw new ExistenceException(e.getMessage());
+
+            film.setId(getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate(), film.getDuration()).getId());
+            return film;
+        } catch (ValidationException | ExistenceException e) {
+            throw new ValidationException(e.getMessage());
         }
     }
 
