@@ -6,14 +6,15 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmDirector;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 public class FilmDirectorStorage {
@@ -46,6 +47,25 @@ public class FilmDirectorStorage {
             dSet.add(directorDbStorage.getDirectorById(fd.getDirectorId()));
         }
         return dSet;
+    }
+
+    public void loadDirectors(Collection<Film> films) {
+        final Map<Integer, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+        final String sqlQuery = "SELECT d.* , film_id FROM directors_films df join directors d on d.director_id = df.director_id  WHERE film_id  in (" + inSql + ")" +
+                "ORDER BY d.director_id ASC";
+
+        jdbcTemplate.query(sqlQuery, (ResultSet rs) -> {
+            final Film film = filmById.get(rs.getInt("film_id"));
+            film.addDirector(mapRowToDirector(rs));
+        }, films.stream().map(Film::getId).toArray());
+    }
+
+    private Director mapRowToDirector(ResultSet resultSet) throws SQLException {
+        return Director.builder()
+                .id(resultSet.getInt("director_id"))
+                .name(resultSet.getString("name"))
+                .build();
     }
 
     private FilmDirector mapRowToFilmDirector(ResultSet resultSet, int rowNum) throws SQLException {

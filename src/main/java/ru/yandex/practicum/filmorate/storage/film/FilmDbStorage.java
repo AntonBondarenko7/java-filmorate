@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @Primary
@@ -290,6 +291,7 @@ public class FilmDbStorage implements FilmStorage {
                         .name(resultSet.getString("MPA_NAME"))
                         .description(resultSet.getString("mpa_description"))
                         .build())
+                .directors(new HashSet<>())
                 .build();
     }
 }

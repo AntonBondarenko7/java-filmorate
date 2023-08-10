@@ -59,9 +59,9 @@ public class FilmService {
 
     public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
         Collection<Film> films = filmStorage.getMostPopularFilms(count, genreId, year);
+        filmDirectorStorage.loadDirectors(films);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
         reviewStorage.loadReviews(films);
         return films;
@@ -72,9 +72,9 @@ public class FilmService {
         Collection<Film> films = filmStorage.getFilmsDirectorSorted(directorId, sortBy);
         if (films.isEmpty())
             throw new ExistenceException("Фильмы не найдены");
+        filmDirectorStorage.loadDirectors(films);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
         reviewStorage.loadReviews(films);
         return films;
@@ -82,9 +82,9 @@ public class FilmService {
 
     public Collection<Film> getAllFilms() throws ExistenceException {
         Collection<Film> films = filmStorage.getAllFilms().values();
+        filmDirectorStorage.loadDirectors(films);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
         reviewStorage.loadReviews(films);
         return films;
@@ -144,9 +144,9 @@ public class FilmService {
 
     public List<Film> getCommonFilms(int userId, int friendId) throws ExistenceException {
         List<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        filmDirectorStorage.loadDirectors(films);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
         reviewStorage.loadReviews(films);
         return films;
@@ -154,9 +154,9 @@ public class FilmService {
 
     public Collection<Film> getRecommendations(int userId) throws ExistenceException {
         Collection<Film> films = filmStorage.getRecommendations(userId);
+        filmDirectorStorage.loadDirectors(films);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
         return films;
     }
@@ -169,9 +169,9 @@ public class FilmService {
             throw new ValidationException("Некорректные параметры поиска");
         }
         List<Film> films = filmStorage.searchFilms(query, searchType);
+        filmDirectorStorage.loadDirectors(films);
         for (Film f : films) {
             f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
         }
         return films;
     }
