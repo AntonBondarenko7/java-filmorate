@@ -22,8 +22,7 @@ public class FilmDirectorStorage {
     private final DirectorDbStorage directorDbStorage;
 
     @Autowired
-    public FilmDirectorStorage(JdbcTemplate jdbcTemplate,
-                               DirectorDbStorage directorDbStorage) {
+    public FilmDirectorStorage(JdbcTemplate jdbcTemplate, DirectorDbStorage directorDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.directorDbStorage = directorDbStorage;
     }
@@ -39,6 +38,25 @@ public class FilmDirectorStorage {
         return jdbcTemplate.update(sqlQuery, filmId) > 0;
     }
 
+    public void updateDirectorsForFilm(Film film) {
+        StringBuilder sb = new StringBuilder();
+        if (film.getDirectors().isEmpty()) {
+            sb.append("DELETE FROM directors_films WHERE film_id = " + film.getId() + " ");
+        } else {
+            List<Integer> filmDirectors = film.getDirectors().stream().map(Director::getId).distinct().collect(Collectors.toList());
+
+            sb.append("DELETE FROM directors_films WHERE film_id = " + film.getId() + " ; " + "INSERT INTO directors_films (film_id, director_id) VALUES ");
+
+            for (Integer genreId : filmDirectors) {
+                sb.append("( " + film.getId() + ", " + genreId + " ), ");
+            }
+            int length = sb.length();
+            sb.deleteCharAt(length - 2);
+        }
+        String sql = sb.toString();
+        jdbcTemplate.update(sql);
+    }
+
     public Set<Director> getFilmDirectorsByFilmId(int filmId) throws ExistenceException {
         String sqlQuery = "SELECT * FROM directors_films WHERE film_id = ? ORDER BY director_id ASC";
         List<FilmDirector> fdlist = jdbcTemplate.query(sqlQuery, this::mapRowToFilmDirector, filmId);
@@ -52,8 +70,7 @@ public class FilmDirectorStorage {
     public void loadDirectors(Collection<Film> films) {
         final Map<Integer, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
         String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
-        final String sqlQuery = "SELECT d.* , film_id FROM directors_films df join directors d on d.director_id = df.director_id  WHERE film_id  in (" + inSql + ")" +
-                "ORDER BY d.director_id ASC";
+        final String sqlQuery = "SELECT d.* , film_id FROM directors_films df join directors d on d.director_id = df.director_id  WHERE film_id  in (" + inSql + ")" + "ORDER BY d.director_id ASC";
 
         jdbcTemplate.query(sqlQuery, (ResultSet rs) -> {
             final Film film = filmById.get(rs.getInt("film_id"));
@@ -62,16 +79,10 @@ public class FilmDirectorStorage {
     }
 
     private Director mapRowToDirector(ResultSet resultSet) throws SQLException {
-        return Director.builder()
-                .id(resultSet.getInt("director_id"))
-                .name(resultSet.getString("name"))
-                .build();
+        return Director.builder().id(resultSet.getInt("director_id")).name(resultSet.getString("name")).build();
     }
 
     private FilmDirector mapRowToFilmDirector(ResultSet resultSet, int rowNum) throws SQLException {
-        return FilmDirector.builder()
-                .filmId(resultSet.getInt("film_id"))
-                .directorId(resultSet.getInt("director_id"))
-                .build();
+        return FilmDirector.builder().filmId(resultSet.getInt("film_id")).directorId(resultSet.getInt("director_id")).build();
     }
 }

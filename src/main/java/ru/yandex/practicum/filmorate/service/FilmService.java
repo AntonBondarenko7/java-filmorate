@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
@@ -19,9 +17,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -102,10 +98,10 @@ public class FilmService {
             Film createdFilm = filmStorage.createFilm(film);
 
             if (film.getDirectors() != null) {
-                for (Director d : film.getDirectors()) {
-                    filmDirectorStorage.createFilmDirector(createdFilm.getId(), d.getId());
-                }
+                filmDirectorStorage.updateDirectorsForFilm(film);
             }
+            if (film.getGenres() != null)
+                filmGenreStorage.updateGenresForFilm(film);
             createdFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(createdFilm.getId()));
             return setFilmGenres(createdFilm);
         } catch (ValidationException e) {
@@ -115,8 +111,6 @@ public class FilmService {
 
     private Film setFilmGenres(Film film) {
         if (film.getGenres() != null) {
-            filmGenreStorage.updateGenresForFilm(film);
-
             film.getGenres().clear();
             Collection<Film> films = List.of(film);
             filmGenreStorage.loadGenres(films);
@@ -128,12 +122,9 @@ public class FilmService {
         try {
             filmDirectorStorage.deleteAllFilmDirectorsByFilmId(film.getId());
             Film updatedFilm = filmStorage.updateFilm(film);
-
-            if (film.getDirectors() != null) {
-                for (Director d : film.getDirectors()) {
-                    filmDirectorStorage.createFilmDirector(film.getId(), d.getId());
-                }
-            }
+            filmGenreStorage.updateGenresForFilm(film);
+            if (film.getDirectors() != null)
+                filmDirectorStorage.updateDirectorsForFilm(film);
             updatedFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(updatedFilm.getId()));
             return setFilmGenres(updatedFilm);
         } catch (ValidationException e) {
