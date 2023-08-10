@@ -32,9 +32,9 @@ public class FilmController extends AdviceController {
 
     @GetMapping("/popular")
     public Collection<Film> getMostPopularFilms(
-            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
-            @RequestParam(value = "genreId", defaultValue = "0") @Positive Integer genreId,
-            @RequestParam(value = "year", defaultValue = "0") @Min(1895) Integer year
+            @RequestParam(value = "count", defaultValue = "10") Integer count,
+            @RequestParam(value = "genreId", defaultValue = "0") Integer genreId,
+            @RequestParam(value = "year", defaultValue = "0") Integer year
     ) {
         return filmService.getMostPopularFilms(count, genreId, year);
     }
