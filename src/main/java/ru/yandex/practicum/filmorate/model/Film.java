@@ -29,7 +29,7 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
     private Set<Genre> genres;
-    private Set<Director> directors;;
+    private Set<Director> directors;
     private MpaRating mpa;
 
     public void addDirector(Director director) {
