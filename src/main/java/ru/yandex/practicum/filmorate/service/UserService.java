@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,12 +80,22 @@ public class UserService {
         return friends;
     }
 
-    public User createUser(User user) throws ValidationException, ExistenceException {
-        return userStorage.createUser(user);
+    public User createUser(User user) {
+        try {
+            UserValidator.validateUser(user);
+            return userStorage.createUser(user);
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
-    public User updateUser(User user) throws ValidationException, ExistenceException {
-        return userStorage.updateUser(user);
+    public User updateUser(User user) {
+        try {
+            UserValidator.validateUser(user);
+            return userStorage.updateUser(user);
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
     public Collection<User> getAllUsers() {

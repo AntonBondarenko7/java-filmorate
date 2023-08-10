@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,20 +27,16 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(User user) throws ValidationException, ExistenceException {
+    public User createUser(User user) {
         try {
-            UserValidator.validateUser(user);
             String sqlQuery = "INSERT INTO users(email, login, name, birthday) " +
                     "VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(sqlQuery,
-//                                userId,
                     user.getEmail(),
                     user.getLogin(),
                     user.getName(),
                     user.getBirthday());
             return getUserByLoginAndEmail(user.getLogin(), user.getEmail());
-        } catch (ValidationException e) {
-            throw new ValidationException(e.getMessage());
         } catch (ExistenceException e) {
             throw new ExistenceException("Ошибка при создании пользователя");
         } catch (DataAccessException e) {
@@ -60,7 +55,6 @@ public class UserDbStorage implements UserStorage {
         }
 
         try {
-            UserValidator.validateUser(user);
             sqlQuery = "UPDATE users SET " +
                     "email = ?, login = ?, name = ?, birthday = ?" +
                     "WHERE id = ?";
@@ -71,8 +65,6 @@ public class UserDbStorage implements UserStorage {
                     user.getBirthday(),
                     user.getId());
             return getUserById(user.getId());
-        } catch (ValidationException e) {
-            throw new ValidationException(e.getMessage());
         } catch (DataAccessException e) {
             throw new ValidationException("Пользователь с таким логином и/или email уже существует");
         }
