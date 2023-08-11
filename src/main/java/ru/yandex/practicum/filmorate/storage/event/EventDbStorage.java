@@ -23,6 +23,7 @@ import java.util.Map;
 public class EventDbStorage implements EventStorage {
     private final NamedParameterJdbcOperations jdbcOperations;
     private static final Logger log = LoggerFactory.getLogger(EventStorage.class);
+    private final FeedRowMapper feedRowMapper;
 
     @Override
     public Event addEvent(Event event) {
@@ -42,7 +43,7 @@ public class EventDbStorage implements EventStorage {
                 "select * " +
                 "from EVENT " +
                 "where USER_ID = :id";
-        return jdbcOperations.query(sqlQuery, Map.of("id", id), new FeedRowMapper());
+        return jdbcOperations.query(sqlQuery, Map.of("id", id), feedRowMapper);
     }
 
     private MapSqlParameterSource getMapQuery(Event event) {

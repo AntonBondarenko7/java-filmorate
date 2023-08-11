@@ -30,7 +30,7 @@ public class FilmService {
     private final ReviewStorage reviewStorage;
     private final EventService eventService;
 
-    public void addLike(int filmId, int userId) throws ValidationException, ExistenceException {
+    public void addLike(int filmId, int userId) {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.createLike(userId, filmId);
@@ -43,7 +43,7 @@ public class FilmService {
                 filmId));
     }
 
-    public void removeLike(int filmId, int userId) throws ValidationException, ExistenceException {
+    public void removeLike(int filmId, int userId) {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.deleteLike(userId, filmId);
@@ -56,7 +56,7 @@ public class FilmService {
                 filmId));
     }
 
-    public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
+    public Collection<Film> getMostPopularFilms(int count, int genreId, int year) {
         Collection<Film> films = filmStorage.getMostPopularFilms(count, genreId, year);
         filmDirectorStorage.loadDirectors(films);
         filmGenreStorage.loadGenres(films);
@@ -65,7 +65,7 @@ public class FilmService {
     }
 
 
-    public Collection<Film> getFilmsDirectorSorted(int directorId, String sortBy) throws ExistenceException {
+    public Collection<Film> getFilmsDirectorSorted(int directorId, String sortBy) {
         Collection<Film> films = filmStorage.getFilmsDirectorSorted(directorId, sortBy);
         if (films.isEmpty())
             throw new ExistenceException("Фильмы не найдены");
@@ -75,7 +75,7 @@ public class FilmService {
         return films;
     }
 
-    public Collection<Film> getAllFilms() throws ExistenceException {
+    public Collection<Film> getAllFilms() {
         Collection<Film> films = filmStorage.getAllFilms().values();
         filmDirectorStorage.loadDirectors(films);
         filmGenreStorage.loadGenres(films);
@@ -83,16 +83,16 @@ public class FilmService {
         return films;
     }
 
-    public Film getFilmById(int filmId) throws ValidationException, ExistenceException {
+    public Film getFilmById(int filmId) {
         Film film = filmStorage.getFilmById(filmId);
-        film.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(filmId));
         Collection<Film> films = List.of(film);
+        filmDirectorStorage.loadDirectors(films);
         filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return film;
     }
 
-    public Film createFilm(Film film) throws ValidationException, ExistenceException {
+    public Film createFilm(Film film) {
         try {
             FilmValidator.validateFilm(film);
             Film createdFilm = filmStorage.createFilm(film);
@@ -102,7 +102,6 @@ public class FilmService {
             }
             if (film.getGenres() != null)
                 filmGenreStorage.updateGenresForFilm(film);
-            createdFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(createdFilm.getId()));
             return setFilmGenres(createdFilm);
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
@@ -118,28 +117,29 @@ public class FilmService {
         return film;
     }
 
-    public Film updateFilm(Film film) throws ValidationException, ExistenceException {
+    public Film updateFilm(Film film) {
         try {
             filmDirectorStorage.deleteAllFilmDirectorsByFilmId(film.getId());
             Film updatedFilm = filmStorage.updateFilm(film);
             filmGenreStorage.updateGenresForFilm(film);
             if (film.getDirectors() != null)
                 filmDirectorStorage.updateDirectorsForFilm(film);
-            updatedFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(updatedFilm.getId()));
+            Collection<Film> films = List.of(updatedFilm);
+            filmDirectorStorage.loadDirectors(films);
             return setFilmGenres(updatedFilm);
         } catch (ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
     }
 
-    public void removeFilmById(int id) throws ValidationException {
+    public void removeFilmById(int id) {
         if (id <= 0) {
             throw new ValidationException("id должен быть положительным");
         }
         filmStorage.removeFilmById(id);
     }
 
-    public List<Film> getCommonFilms(int userId, int friendId) throws ExistenceException {
+    public List<Film> getCommonFilms(int userId, int friendId) {
         List<Film> films = filmStorage.getCommonFilms(userId, friendId);
         filmDirectorStorage.loadDirectors(films);
         filmGenreStorage.loadGenres(films);
@@ -147,7 +147,7 @@ public class FilmService {
         return films;
     }
 
-    public Collection<Film> getRecommendations(int userId) throws ExistenceException {
+    public Collection<Film> getRecommendations(int userId) {
         Collection<Film> films = filmStorage.getRecommendations(userId);
         filmDirectorStorage.loadDirectors(films);
         filmGenreStorage.loadGenres(films);
@@ -155,7 +155,7 @@ public class FilmService {
         return films;
     }
 
-    public List<Film> searchFilms(String query, String searchType) throws ValidationException, ExistenceException {
+    public List<Film> searchFilms(String query, String searchType) {
         if (!searchType.equals("title") &&
                 !searchType.equals("director") &&
                 !searchType.equals("director,title") &&

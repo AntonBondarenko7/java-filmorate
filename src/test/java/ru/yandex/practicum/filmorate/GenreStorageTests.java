@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmGenreDBStorage;
 
@@ -81,7 +80,7 @@ public class GenreStorageTests {
     }
 
     @Test
-    public void testGetGenreById() throws ExistenceException {
+    public void testGetGenreById() {
         String genreName = "Test genre";
         genreStorage.createGenre(new Genre(1, genreName));
         List<Genre> genres = genreStorage.getAll();
@@ -93,7 +92,7 @@ public class GenreStorageTests {
     }
 
     @Test
-    public void testUpdateGenre() throws ExistenceException {
+    public void testUpdateGenre() {
         String updatedName = "Test genre updated";
         genreStorage.createGenre(new Genre(1,"Test genre updated"));
         List<Genre> genres = genreStorage.getAll();

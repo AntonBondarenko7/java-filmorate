@@ -24,7 +24,7 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Film createFilm(Film film) throws ValidationException {
+    public Film createFilm(Film film) {
         try {
             String sqlQuery = "INSERT INTO films (name, description, release_date, " +
                     "duration, mpa_rating_id) VALUES (?, ?, ?, ?, ?)";
@@ -43,7 +43,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) throws ValidationException, ExistenceException {
+    public Film updateFilm(Film film) {
         getFilmById(film.getId());
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?" +
@@ -80,7 +80,7 @@ public class FilmDbStorage implements FilmStorage {
         return filmMap;
     }
 
-    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate, int duration) throws ExistenceException {
+    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate, int duration) {
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
                 "FROM films f\n" +
@@ -145,7 +145,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(int filmId) throws ExistenceException {
+    public Film getFilmById(int filmId) {
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
                 "FROM films f\n" +
@@ -172,9 +172,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException {
+    public List<Film> getFilmsDirectorSorted(int directorId, String sortBy) {
         String sqlOrderBy = "";
-        if (sortby.equals("likes"))
+        if (sortBy.equals("likes"))
             sqlOrderBy = "COUNT(l.id) DESC";
         else
             sqlOrderBy = "release_date ";
@@ -193,7 +193,7 @@ public class FilmDbStorage implements FilmStorage {
             } catch (ExistenceException e) {
                 throw new RuntimeException(e);
             }
-        }, directorid);
+        }, directorId);
     }
 
     @Override
@@ -271,7 +271,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))

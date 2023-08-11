@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.validator.DirectorValidator;
@@ -24,7 +22,7 @@ public class DirectorService {
         return directorStorage.getDirectors();
     }
 
-    public Director getDirectorById(int id) throws ExistenceException, ValidationException {
+    public Director getDirectorById(int id) {
         return directorStorage.getDirectorById(id);
     }
 

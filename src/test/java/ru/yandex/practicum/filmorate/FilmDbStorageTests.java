@@ -36,7 +36,7 @@ public class FilmDbStorageTests {
     private final LikeStorage likeStorage;
 
     @BeforeEach
-    void setUp() throws ExistenceException, ValidationException {
+    void setUp() {
         Film film = Film.builder()
                 .name("Test film")
                 .description("Test description")
@@ -49,7 +49,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testCreateFilm() throws ValidationException, ExistenceException {
+    public void testCreateFilm() {
         Film film = Film.builder()
                 .name("Test film1")
                 .description("Test description1")
@@ -69,7 +69,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testUpdateFilm() throws ExistenceException, ValidationException {
+    public void testUpdateFilm() {
         int filmId = filmDbStorage.getAllFilms().keySet().stream().findFirst().get().intValue();
         Film film = Film.builder()
                 .id(filmId)
@@ -98,7 +98,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testGetMostPopularFilms() throws ValidationException, ExistenceException {
+    public void testGetMostPopularFilms() {
         User user = User.builder()
                 .email("test@example.com")
                 .login("testuser")
@@ -124,7 +124,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testGetFilmById() throws ExistenceException, ValidationException {
+    public void testGetFilmById() {
         Film film = Film.builder()
                 .name("Test film2")
                 .description("Test description2")

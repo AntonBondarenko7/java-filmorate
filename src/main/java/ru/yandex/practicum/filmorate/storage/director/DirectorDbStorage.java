@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.validator.DirectorValidator;
 
@@ -31,7 +30,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Director addDirector(Director director) throws ValidationException {
+    public Director addDirector(Director director) {
         DirectorValidator.validateDirector(director);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("directors")
@@ -47,7 +46,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Director getDirectorById(int id) throws ExistenceException {
+    public Director getDirectorById(int id) {
         String sql = "SELECT director_id , name FROM directors WHERE director_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToDirector, id);

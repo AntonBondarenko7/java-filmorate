@@ -21,7 +21,6 @@ public class Film {
     private int id;
     private String name;
     private String description;
-    private Set<Integer> likes;
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")

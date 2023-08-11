@@ -10,6 +10,9 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -29,8 +32,15 @@ public class AdviceController {
 
     @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleAllUnhandledExceptions(final Throwable t) {
-        log.debug("Непредвиденная ошибка: 500 Internal Server Error {}", t.getMessage(), t);
-        return new ResponseEntity<>(Map.of("Непредвиденная ошибка", t.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        String stackTrace = getStackTraceAsString(t);
+
+        log.debug("Непредвиденная ошибка: 500 Internal Server Error {}", stackTrace);
+
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("Непредвиденная ошибка", t.getMessage());
+        responseBody.put("Stack Trace", stackTrace);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler
@@ -43,5 +53,12 @@ public class AdviceController {
     public ResponseEntity<Map<String, String>> handleNotValidArgumentException(final MethodArgumentNotValidException e) {
         log.debug("Ошибка валидации: 400 Bad Request {}", e.getMessage(), e);
         return new ResponseEntity<>(Map.of("Ошибка валидации", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    private String getStackTraceAsString(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString();
     }
 }

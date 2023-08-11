@@ -39,7 +39,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) throws ValidationException, ExistenceException {
+    public User updateUser(User user) {
         String sqlQuery = "SELECT * FROM users WHERE id = ?";
         try {
             jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, user.getId());
@@ -77,7 +77,7 @@ public class UserDbStorage implements UserStorage {
         return userMap;
     }
 
-    public User getUserByLoginAndEmail(String login, String email) throws ExistenceException {
+    public User getUserByLoginAndEmail(String login, String email) {
         String sqlQuery = "SELECT * from users WHERE login = ? AND email = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, login, email);
@@ -88,7 +88,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(int userId) throws ExistenceException {
+    public User getUserById(int userId) {
         String sqlQuery = "SELECT * from users WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
@@ -102,6 +102,25 @@ public class UserDbStorage implements UserStorage {
     public void removeUserById(int id) {
         String sqlQuery = "DELETE FROM users WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public List<User> getUserFriends(int userId) {
+        String sqlQuery = "SELECT u.*\n" +
+                          "FROM users u\n" +
+                          "INNER JOIN friendships f on u.id = f.user2_id\n" +
+                          "WHERE f.user1_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
+    }
+
+    @Override
+    public List<User> getCommonFriends(int user1Id, int friendId) {
+        String sqlQuery = "SELECT u.* \n" +
+                "FROM users u \n" +
+                "INNER JOIN friendships f on u.id = f.user2_id \n" +
+                "WHERE f.user1_id = ? AND f.user2_id IN \n" +
+                "(SELECT f2.user2_id FROM friendships f2 WHERE f2.user1_id = ?)";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, user1Id, friendId);
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

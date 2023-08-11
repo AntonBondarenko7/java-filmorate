@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -11,12 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FilmValidatorTest {
-    private FilmValidator filmValidator;
-
-    @BeforeEach
-    void setUp() {
-        filmValidator = new FilmValidator();
-    }
 
     @Test
     void checkFilmNameValid() {
