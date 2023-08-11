@@ -57,7 +57,7 @@ public class AdviceController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleValidationConstrainException(    ConstraintViolationException ex){
+    public ResponseEntity<String> handleValidationConstrainException(ConstraintViolationException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

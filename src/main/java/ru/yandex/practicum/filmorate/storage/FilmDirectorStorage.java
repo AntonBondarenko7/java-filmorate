@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmDirector;
 
 
 import java.sql.ResultSet;
@@ -56,9 +55,5 @@ public class FilmDirectorStorage {
 
     private Director mapRowToDirector(ResultSet resultSet) throws SQLException {
         return Director.builder().id(resultSet.getInt("director_id")).name(resultSet.getString("name")).build();
-    }
-
-    private FilmDirector mapRowToFilmDirector(ResultSet resultSet, int rowNum) throws SQLException {
-        return FilmDirector.builder().filmId(resultSet.getInt("film_id")).directorId(resultSet.getInt("director_id")).build();
     }
 }
