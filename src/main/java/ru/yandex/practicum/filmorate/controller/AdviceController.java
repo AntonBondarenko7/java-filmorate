@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -53,6 +54,11 @@ public class AdviceController {
     public ResponseEntity<Map<String, String>> handleNotValidArgumentException(final MethodArgumentNotValidException e) {
         log.debug("Ошибка валидации: 400 Bad Request {}", e.getMessage(), e);
         return new ResponseEntity<>(Map.of("Ошибка валидации", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleValidationConstrainException(    ConstraintViolationException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     private String getStackTraceAsString(Throwable throwable) {

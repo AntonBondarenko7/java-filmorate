@@ -7,8 +7,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.validator.YearValidator;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
 
 @Validated
@@ -30,9 +33,9 @@ public class FilmController extends AdviceController {
 
     @GetMapping("/popular")
     public Collection<Film> getMostPopularFilms(
-            @RequestParam(value = "count", defaultValue = "10") Integer count,
-            @RequestParam(value = "genreId", defaultValue = "0") Integer genreId,
-            @RequestParam(value = "year", defaultValue = "0") Integer year
+            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
+            @RequestParam(value = "genreId", defaultValue = "0") @Min(0) Integer genreId,
+            @RequestParam(value = "year", defaultValue = "0") @YearValidator Integer year
     ) {
         return filmService.getMostPopularFilms(count, genreId, year);
     }
