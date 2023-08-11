@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -172,9 +172,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsDirectorSorted(int directorId, String sortBy) {
+    public List<Film> getFilmsDirectorSorted(int directorId, FilmSortBy sortBy) {
         String sqlOrderBy = "";
-        if (sortBy.equals("likes"))
+        if (sortBy == FilmSortBy.likes)
             sqlOrderBy = "COUNT(l.id) DESC";
         else
             sqlOrderBy = "release_date ";

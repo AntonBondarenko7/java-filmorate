@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
@@ -65,7 +66,7 @@ public class FilmService {
     }
 
 
-    public Collection<Film> getFilmsDirectorSorted(int directorId, String sortBy) {
+    public Collection<Film> getFilmsDirectorSorted(int directorId, FilmSortBy sortBy) {
         Collection<Film> films = filmStorage.getFilmsDirectorSorted(directorId, sortBy);
         if (films.isEmpty())
             throw new ExistenceException("Фильмы не найдены");

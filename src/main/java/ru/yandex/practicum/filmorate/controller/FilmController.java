@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.validator.YearValidator;
 
@@ -42,7 +43,7 @@ public class FilmController extends AdviceController {
 
 
     @GetMapping("/director/{directorId}")
-    public Collection<Film> getFilmsDirectorSorted(@PathVariable Integer directorId, @RequestParam String sortBy) {
+    public Collection<Film> getFilmsDirectorSorted(@PathVariable Integer directorId, @RequestParam("sortBy") FilmSortBy sortBy) {
         return filmService.getFilmsDirectorSorted(directorId, sortBy);
     }
 
