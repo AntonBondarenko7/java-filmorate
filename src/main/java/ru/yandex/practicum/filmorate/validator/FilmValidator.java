@@ -14,9 +14,8 @@ import java.time.format.DateTimeParseException;
 public class FilmValidator {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    String START_DATE = "1895-12-28";
+    final String START_DATE = "1895-12-28";
     private final LocalDate date = LocalDate.parse(START_DATE, formatter);
-
 
     public void validateFilm(Film film) {
         checkFilmName(film.getName());
