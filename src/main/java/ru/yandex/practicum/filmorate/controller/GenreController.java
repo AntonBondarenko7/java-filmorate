@@ -1,33 +1,44 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.service.GenreService;
 
-import java.util.Collection;
+import java.util.List;
 
-@Component
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/genres")
-public class GenreController extends AdviceController {
-    private final GenreStorage genreStorage;
+public class GenreController {
+
+    private final GenreService genreService;
 
     @GetMapping
-    public Collection<Genre> getAllGenres() {
-        return genreStorage.getAllGenres();
+    public List<Genre> getAll() {
+        log.info("Получен GET запрос");
+        return genreService.findAllGenres();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getGenreById(@PathVariable int id) throws ExistenceException {
-        return new ResponseEntity<>(genreStorage.getGenreById(id), HttpStatus.OK);
+    public Genre get(@PathVariable int id) {
+        log.info("Получен GET запрос");
+        return genreService.getById(id);
+    }
+
+    @GetMapping("/film/{id}")
+    public List<Genre> findGenresByFilmId(@PathVariable int id) {
+        return genreService.getFilmGenres(id);
+    }
+
+    @PostMapping
+    public Genre addGenre(@RequestBody Genre genre) {
+        return genreService.createGenre(genre);
     }
 }

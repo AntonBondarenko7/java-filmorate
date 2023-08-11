@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
 
@@ -80,7 +79,7 @@ public class MpaRatingStorageTests {
     }
 
     @Test
-    public void testGetMpaRatingById() throws ExistenceException {
+    public void testGetMpaRatingById() {
         String name = "Test";
         String description = "Test description";
         mpaRatingStorage.createMpaRating(name, description);
@@ -94,7 +93,7 @@ public class MpaRatingStorageTests {
     }
 
     @Test
-    public void testUpdateMpaRating() throws ExistenceException {
+    public void testUpdateMpaRating() {
         String name = "Test";
         String description = "Test description";
         mpaRatingStorage.createMpaRating(name, description);

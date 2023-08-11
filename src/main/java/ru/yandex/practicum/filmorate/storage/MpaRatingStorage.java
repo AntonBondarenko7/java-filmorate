@@ -40,7 +40,7 @@ public class MpaRatingStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToMpaRating);
     }
 
-    public MpaRating getMpaRatingById(int id) throws ExistenceException {
+    public MpaRating getMpaRatingById(int id) {
         String sqlQuery = "SELECT * FROM mpa_ratings WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, id);
@@ -50,7 +50,7 @@ public class MpaRatingStorage {
         }
     }
 
-    public MpaRating updateMpaRating(MpaRating mpa) throws ExistenceException {
+    public MpaRating updateMpaRating(MpaRating mpa) {
         String sqlQuery = "SELECT * FROM mpa_ratings WHERE id = ?";
         try {
             jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpaRating, mpa.getId());

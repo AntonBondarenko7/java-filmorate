@@ -1,36 +1,31 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
-@Primary
+
 @Repository
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     @Override
-    public Film createFilm(Film film) throws ValidationException {
+    public Film createFilm(Film film) {
         try {
-            FilmValidator.validateFilm(film);
             String sqlQuery = "INSERT INTO films (name, description, release_date, " +
                     "duration, mpa_rating_id) VALUES (?, ?, ?, ?, ?)";
             jdbcTemplate.update(sqlQuery,
@@ -39,31 +34,28 @@ public class FilmDbStorage implements FilmStorage {
                     film.getReleaseDate(),
                     film.getDuration(),
                     film.getMpa().getId());
-            return getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate(), film.getDuration());
+
+            film.setId(getFilmByNameAndReleaseDate(film.getName(), film.getReleaseDate(), film.getDuration()).getId());
+            return film;
         } catch (ValidationException | ExistenceException e) {
             throw new ValidationException(e.getMessage());
         }
     }
 
     @Override
-    public Film updateFilm(Film film) throws ValidationException, ExistenceException {
+    public Film updateFilm(Film film) {
         getFilmById(film.getId());
-        try {
-            FilmValidator.validateFilm(film);
-            String sqlQuery = "UPDATE films SET " +
-                    "name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?" +
-                    "WHERE id = ?";
-            jdbcTemplate.update(sqlQuery,
-                    film.getName(),
-                    film.getDescription(),
-                    film.getReleaseDate(),
-                    film.getDuration(),
-                    film.getMpa().getId(),
-                    film.getId());
-            return getFilmById(film.getId());
-        } catch (ValidationException e) {
-            throw new ValidationException(e.getMessage());
-        }
+        String sqlQuery = "UPDATE films SET " +
+                "name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?" +
+                "WHERE id = ?";
+        jdbcTemplate.update(sqlQuery,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId());
+        return getFilmById(film.getId());
     }
 
     @Override
@@ -88,7 +80,7 @@ public class FilmDbStorage implements FilmStorage {
         return filmMap;
     }
 
-    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate, int duration) throws ExistenceException {
+    public Film getFilmByNameAndReleaseDate(String name, LocalDate releaseDate, int duration) {
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
                 "FROM films f\n" +
@@ -153,7 +145,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(int filmId) throws ExistenceException {
+    public Film getFilmById(int filmId) {
         String sqlQuery = "SELECT f.id,  f.name, f.description, f.release_date, f.duration, f.mpa_rating_id, " +
                 "mr.name AS mpa_name, mr.description AS mpa_description\n" +
                 "FROM films f\n" +
@@ -180,9 +172,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsDirectorSorted(int directorid, String sortby) throws ExistenceException {
+    public List<Film> getFilmsDirectorSorted(int directorId, FilmSortBy sortBy) {
         String sqlOrderBy = "";
-        if (sortby.equals("likes"))
+        if (sortBy == FilmSortBy.likes)
             sqlOrderBy = "COUNT(l.id) DESC";
         else
             sqlOrderBy = "release_date ";
@@ -201,7 +193,7 @@ public class FilmDbStorage implements FilmStorage {
             } catch (ExistenceException e) {
                 throw new RuntimeException(e);
             }
-        }, directorid);
+        }, directorId);
     }
 
     @Override
@@ -279,7 +271,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException, ExistenceException {
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
@@ -290,6 +282,7 @@ public class FilmDbStorage implements FilmStorage {
                         .name(resultSet.getString("MPA_NAME"))
                         .description(resultSet.getString("mpa_description"))
                         .build())
+                .directors(new HashSet<>())
                 .build();
     }
 }

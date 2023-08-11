@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -10,10 +9,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.validator.ReviewValidator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,7 +18,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Primary
+
 @Repository
 @RequiredArgsConstructor
 public class ReviewDBStorage implements ReviewStorage {
@@ -30,30 +27,25 @@ public class ReviewDBStorage implements ReviewStorage {
     private final NamedParameterJdbcOperations jdbcOperations;
 
     @Override
-    public Review createReview(Review review) throws ValidationException {
-        try {
-            ReviewValidator.validateReview(review);
-            String sql = "INSERT INTO reviews (content, is_positive, user_id, film_id) " +
-                    "VALUES (:content, :is_positive, :user_id, :film_id) ";
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            MapSqlParameterSource map = new MapSqlParameterSource();
-            map.addValue("content", review.getContent());
-            map.addValue("is_positive", review.getIsPositive());
-            map.addValue("user_id", review.getUserId());
-            map.addValue("film_id", review.getFilmId());
+    public Review createReview(Review review) {
+        String sql = "INSERT INTO reviews (content, is_positive, user_id, film_id) " +
+                "VALUES (:content, :is_positive, :user_id, :film_id) ";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("content", review.getContent());
+        map.addValue("is_positive", review.getIsPositive());
+        map.addValue("user_id", review.getUserId());
+        map.addValue("film_id", review.getFilmId());
 
-            jdbcOperations.update(sql, map, keyHolder);
-            int reviewId = keyHolder.getKey().intValue();
+        jdbcOperations.update(sql, map, keyHolder);
+        int reviewId = keyHolder.getKey().intValue();
 
-            review.setReviewId(reviewId);
-            return review;
-        } catch (ValidationException e) {
-            throw new ValidationException(e.getMessage());
-        }
+        review.setReviewId(reviewId);
+        return review;
     }
 
     @Override
-    public Review updateReview(Review review) throws ExistenceException {
+    public Review updateReview(Review review) {
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE id = ?";
         jdbcTemplate.update(sql,
                 review.getContent(),
@@ -63,7 +55,7 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public Review removeReviewById(int id) throws ExistenceException {
+    public Review removeReviewById(int id) {
         Review toReturn = getReviewById(id);
         String sql = "DELETE FROM reviews WHERE id = ?";
         jdbcTemplate.update(sql, id);
@@ -71,7 +63,7 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public Review getReviewById(int id) throws ExistenceException {
+    public Review getReviewById(int id) {
         String sql = "SELECT r.id as id, r.content, r.is_positive, r.user_id, r.film_id, " +
                 " (COUNT(rl.user_id) - COUNT(rd.user_id)) AS useful " +
                 " FROM reviews AS r " +
@@ -185,7 +177,7 @@ public class ReviewDBStorage implements ReviewStorage {
         }, films.stream().map(Film::getId).toArray());
     }
 
-    private Review mapRowToReview(ResultSet resultSet) throws SQLException, ExistenceException {
+    private Review mapRowToReview(ResultSet resultSet) throws SQLException {
         return Review.builder()
                 .reviewId(resultSet.getInt("id"))
                 .content(resultSet.getString("content"))

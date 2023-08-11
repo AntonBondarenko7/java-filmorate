@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.event;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventType;
@@ -18,16 +18,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-@Primary
 @Repository
+@RequiredArgsConstructor
 public class EventDbStorage implements EventStorage {
     private final NamedParameterJdbcOperations jdbcOperations;
     private static final Logger log = LoggerFactory.getLogger(EventStorage.class);
-
-    @Autowired
-    public EventDbStorage(NamedParameterJdbcOperations jdbcOperations) {
-        this.jdbcOperations = jdbcOperations;
-    }
+    private final FeedRowMapper feedRowMapper;
 
     @Override
     public Event addEvent(Event event) {
@@ -47,7 +43,7 @@ public class EventDbStorage implements EventStorage {
                 "select * " +
                 "from EVENT " +
                 "where USER_ID = :id";
-        return jdbcOperations.query(sqlQuery, Map.of("id", id), new FeedRowMapper());
+        return jdbcOperations.query(sqlQuery, Map.of("id", id), feedRowMapper);
     }
 
     private MapSqlParameterSource getMapQuery(Event event) {
@@ -60,6 +56,7 @@ public class EventDbStorage implements EventStorage {
         return mapToReturn;
     }
 
+    @Component
     private static class FeedRowMapper implements RowMapper<Event> {
         @Override
         public Event mapRow(ResultSet rs, int rowNum) throws SQLException {

@@ -8,8 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.model.User;
@@ -40,7 +38,7 @@ public class LikeStorageTests {
     private int filmId;
 
     @BeforeEach
-    void setUp() throws ExistenceException, ValidationException {
+    void setUp() {
         User user = User.builder()
                 .email("test@example.com")
                 .login("testuser")

@@ -4,18 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,12 +26,12 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikeStorage likeStorage;
-    private final FilmGenreStorage filmGenreStorage;
+    private final FilmGenreDBStorage filmGenreStorage;
     private final FilmDirectorStorage filmDirectorStorage;
     private final ReviewStorage reviewStorage;
     private final EventService eventService;
 
-    public void addLike(int filmId, int userId) throws ValidationException, ExistenceException {
+    public void addLike(int filmId, int userId) {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.createLike(userId, filmId);
@@ -44,7 +44,7 @@ public class FilmService {
                 filmId));
     }
 
-    public void removeLike(int filmId, int userId) throws ValidationException, ExistenceException {
+    public void removeLike(int filmId, int userId) {
         userStorage.getUserById(userId);
         filmStorage.getFilmById(filmId);
         likeStorage.deleteLike(userId, filmId);
@@ -57,111 +57,106 @@ public class FilmService {
                 filmId));
     }
 
-    public Collection<Film> getMostPopularFilms(int count, int genreId, int year) throws ExistenceException {
+    public Collection<Film> getMostPopularFilms(int count, int genreId, int year) {
         Collection<Film> films = filmStorage.getMostPopularFilms(count, genreId, year);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
 
 
-    public Collection<Film> getFilmsDirectorSorted(int directorId, String sortBy) throws ExistenceException {
+    public Collection<Film> getFilmsDirectorSorted(int directorId, FilmSortBy sortBy) {
         Collection<Film> films = filmStorage.getFilmsDirectorSorted(directorId, sortBy);
         if (films.isEmpty())
             throw new ExistenceException("Фильмы не найдены");
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
 
-    public Collection<Film> getAllFilms() throws ExistenceException {
+    public Collection<Film> getAllFilms() {
         Collection<Film> films = filmStorage.getAllFilms().values();
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
 
-    public Film getFilmById(int filmId) throws ValidationException, ExistenceException {
+    public Film getFilmById(int filmId) {
         Film film = filmStorage.getFilmById(filmId);
-        film.setGenres(filmGenreStorage.getFilmGenresByFilmId(filmId));
-        film.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(filmId));
         Collection<Film> films = List.of(film);
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return film;
     }
 
-    public Film createFilm(Film film) throws ValidationException, ExistenceException {
-        Film createdFilm = filmStorage.createFilm(film);
-        if (film.getGenres() != null) {
-            for (Genre g : film.getGenres()) {
-                filmGenreStorage.createFilmGenre(createdFilm.getId(), g.getId());
+    public Film createFilm(Film film) {
+        try {
+            FilmValidator.validateFilm(film);
+            Film createdFilm = filmStorage.createFilm(film);
+
+            if (film.getDirectors() != null) {
+                filmDirectorStorage.updateDirectorsForFilm(film);
             }
+            if (film.getGenres() != null)
+                filmGenreStorage.updateGenresForFilm(film);
+            return setFilmGenres(createdFilm);
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
-        createdFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(createdFilm.getId()));
-        if (film.getDirectors() != null) {
-            for (Director d : film.getDirectors()) {
-                filmDirectorStorage.createFilmDirector(createdFilm.getId(), d.getId());
-            }
-        }
-        createdFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(createdFilm.getId()));
-        return createdFilm;
     }
 
-    public Film updateFilm(Film film) throws ValidationException, ExistenceException {
-        filmGenreStorage.deleteAllFilmGenresByFilmId(film.getId());
-        filmDirectorStorage.deleteAllFilmDirectorsByFilmId(film.getId());
+    private Film setFilmGenres(Film film) {
         if (film.getGenres() != null) {
-            for (Genre g : film.getGenres()) {
-                filmGenreStorage.createFilmGenre(film.getId(), g.getId());
-            }
+            film.getGenres().clear();
+            Collection<Film> films = List.of(film);
+            filmGenreStorage.loadGenres(films);
         }
-        if (film.getDirectors() != null) {
-            for (Director d : film.getDirectors()) {
-                filmDirectorStorage.createFilmDirector(film.getId(), d.getId());
-            }
-        }
-        Film updatedFilm = filmStorage.updateFilm(film);
-        updatedFilm.setGenres(filmGenreStorage.getFilmGenresByFilmId(updatedFilm.getId()));
-        updatedFilm.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(updatedFilm.getId()));
-        return updatedFilm;
+        return film;
     }
 
-    public void removeFilmById(int id) throws ValidationException {
+    public Film updateFilm(Film film) {
+        try {
+            filmDirectorStorage.deleteAllFilmDirectorsByFilmId(film.getId());
+            Film updatedFilm = filmStorage.updateFilm(film);
+            filmGenreStorage.updateGenresForFilm(film);
+            if (film.getDirectors() != null)
+                filmDirectorStorage.updateDirectorsForFilm(film);
+            Collection<Film> films = List.of(updatedFilm);
+            filmDirectorStorage.loadDirectors(films);
+            return setFilmGenres(updatedFilm);
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
+    }
+
+    public void removeFilmById(int id) {
         if (id <= 0) {
             throw new ValidationException("id должен быть положительным");
         }
         filmStorage.removeFilmById(id);
     }
 
-    public List<Film> getCommonFilms(int userId, int friendId) throws ExistenceException {
+    public List<Film> getCommonFilms(int userId, int friendId) {
         List<Film> films = filmStorage.getCommonFilms(userId, friendId);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
         reviewStorage.loadReviews(films);
         return films;
     }
 
-    public Collection<Film> getRecommendations(int userId) throws ExistenceException {
+    public Collection<Film> getRecommendations(int userId) {
         Collection<Film> films = filmStorage.getRecommendations(userId);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
+        reviewStorage.loadReviews(films);
         return films;
     }
 
-    public List<Film> searchFilms(String query, String searchType) throws ValidationException, ExistenceException {
+    public List<Film> searchFilms(String query, String searchType) {
         if (!searchType.equals("title") &&
                 !searchType.equals("director") &&
                 !searchType.equals("director,title") &&
@@ -169,10 +164,9 @@ public class FilmService {
             throw new ValidationException("Некорректные параметры поиска");
         }
         List<Film> films = filmStorage.searchFilms(query, searchType);
-        for (Film f : films) {
-            f.setGenres(filmGenreStorage.getFilmGenresByFilmId(f.getId()));
-            f.setDirectors(filmDirectorStorage.getFilmDirectorsByFilmId(f.getId()));
-        }
+        filmDirectorStorage.loadDirectors(films);
+        filmGenreStorage.loadGenres(films);
+        reviewStorage.loadReviews(films);
         return films;
     }
 }

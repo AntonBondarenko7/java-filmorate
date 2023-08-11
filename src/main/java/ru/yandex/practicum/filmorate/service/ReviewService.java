@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -10,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
+import ru.yandex.practicum.filmorate.validator.ReviewValidator;
 
 import java.util.List;
 
@@ -20,7 +20,8 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final EventService eventService;
 
-    public Review createReview(Review review) throws ValidationException {
+    public Review createReview(Review review) {
+        ReviewValidator.validateReview(review);
         checkId(review.getFilmId());
         checkId(review.getUserId());
         Review toReturn = reviewStorage.createReview(review);
@@ -34,7 +35,8 @@ public class ReviewService {
         return toReturn;
     }
 
-    public Review updateReview(Review review) throws ValidationException, ExistenceException {
+    public Review updateReview(Review review) {
+        ReviewValidator.validateReview(review);
         checkId(review.getReviewId());
         checkId(review.getFilmId());
         checkId(review.getUserId());
@@ -49,7 +51,7 @@ public class ReviewService {
         return toReturn;
     }
 
-    public void removeReviewById(int id) throws ValidationException, ExistenceException {
+    public void removeReviewById(int id) {
         checkId(id);
         Review review = reviewStorage.removeReviewById(id);
         eventService.addEvent(new Event(
@@ -61,7 +63,7 @@ public class ReviewService {
                 review.getFilmId()));
     }
 
-    private void checkId(Integer id) throws NotFoundException, ValidationException {
+    private void checkId(Integer id) {
         if (id == null) {
             throw new ValidationException("id не передан");
         } else if (id <= 0) {
@@ -69,7 +71,7 @@ public class ReviewService {
         }
     }
 
-    public Review getReviewById(int id) throws ValidationException, ExistenceException {
+    public Review getReviewById(int id) {
         checkId(id);
         return reviewStorage.getReviewById(id);
     }
@@ -84,25 +86,25 @@ public class ReviewService {
         return reviews;
     }
 
-    public void putLike(int id, int userId) throws ValidationException {
+    public void putLike(int id, int userId) {
         checkId(id);
         checkId(userId);
         reviewStorage.putLike(id, userId);
     }
 
-    public void putDislike(int id, int userId) throws ValidationException {
+    public void putDislike(int id, int userId) {
         checkId(id);
         checkId(userId);
         reviewStorage.putDislike(id, userId);
     }
 
-    public void removeLike(int id, int userId) throws ValidationException {
+    public void removeLike(int id, int userId) {
         checkId(id);
         checkId(userId);
         reviewStorage.removeLike(id, userId);
     }
 
-    public void removeDislike(int id, int userId) throws ValidationException {
+    public void removeDislike(int id, int userId) {
         checkId(id);
         checkId(userId);
         reviewStorage.removeDislike(id, userId);

@@ -2,17 +2,12 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import java.util.List;
 
-@Component
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
@@ -21,24 +16,24 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody Review review) throws ValidationException {
-        return new ResponseEntity<>(reviewService.createReview(review), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Review createReview(@RequestBody Review review) {
+        return reviewService.createReview(review);
     }
 
     @PutMapping
-    public ResponseEntity<?> updateReview(@RequestBody Review review) throws ValidationException, ExistenceException {
-        return new ResponseEntity<>(reviewService.updateReview(review), HttpStatus.OK);
+    public Review updateReview(@RequestBody Review review) {
+        return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeReviewById(@PathVariable int id) throws ValidationException, ExistenceException {
+    public void removeReviewById(@PathVariable int id) {
         reviewService.removeReviewById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getReviewById(@PathVariable int id) throws ExistenceException, ValidationException {
-        return new ResponseEntity<>(reviewService.getReviewById(id), HttpStatus.OK);
+    public Review getReviewById(@PathVariable int id) {
+        return reviewService.getReviewById(id);
     }
 
     @GetMapping
@@ -49,30 +44,26 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> putLike(@PathVariable int id,
-                                     @PathVariable int userId) throws ValidationException {
+    public void putLike(@PathVariable int id,
+                        @PathVariable int userId) {
         reviewService.putLike(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public ResponseEntity<?> putDislike(@PathVariable int id,
-                                        @PathVariable int userId) throws ValidationException {
+    public void putDislike(@PathVariable int id,
+                                        @PathVariable int userId) {
         reviewService.putDislike(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> removeLike(@PathVariable int id,
-                                        @PathVariable int userId) throws ValidationException {
+    public void removeLike(@PathVariable int id,
+                                        @PathVariable int userId) {
         reviewService.removeLike(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public ResponseEntity<?> removeDislike(@PathVariable int id,
-                                           @PathVariable int userId) throws ValidationException {
+    public void removeDislike(@PathVariable int id,
+                                           @PathVariable int userId) {
         reviewService.removeDislike(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

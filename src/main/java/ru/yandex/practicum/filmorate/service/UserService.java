@@ -2,18 +2,16 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventOperation;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
-import java.util.ArrayList;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +20,7 @@ public class UserService {
     private final FriendshipStorage friendshipStorage;
     private final EventService eventService;
 
-    public void addFriend(int id, int friendId) throws ValidationException, ExistenceException {
+    public void addFriend(int id, int friendId) {
         userStorage.getUserById(id);
         userStorage.getUserById(friendId);
         friendshipStorage.createFriendship(id, friendId);
@@ -35,7 +33,7 @@ public class UserService {
                 friendId));
     }
 
-    public void removeFriend(int id, int friendId) throws ValidationException, ExistenceException {
+    public void removeFriend(int id, int friendId) {
         userStorage.getUserById(id);
         userStorage.getUserById(friendId);
         friendshipStorage.deleteFriendship(id, friendId);
@@ -48,60 +46,44 @@ public class UserService {
                 friendId));
     }
 
-    public ArrayList<User> getCommonFriends(int id, int friendId) throws ValidationException, ExistenceException {
-        ArrayList<User> commonFriends = new ArrayList<>();
-        ArrayList<Integer> commonFriendsIds = new ArrayList<>(friendshipStorage.getCommonFriendIds(id, friendId));
-        for (Integer i : commonFriendsIds) {
-            commonFriends.add(userStorage.getUserById(i));
+    public List<User> getCommonFriends(int id, int friendId) {
+        getUserById(id);
+        getUserById(friendId);
+        return userStorage.getCommonFriends(id, friendId);
+    }
+
+    public List<User> getUserFriends(int userId) {
+        getUserById(userId);
+        return userStorage.getUserFriends(userId);
+    }
+
+    public User createUser(User user) {
+        try {
+            UserValidator.validateUser(user);
+            return userStorage.createUser(user);
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
-        return commonFriends;
     }
 
-    public ArrayList<User> getUserFriends(int userId) throws ValidationException, ExistenceException {
-        ArrayList<User> friends = new ArrayList<>();
-
-        if (getUserById(userId) != null) {
-            ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
-            for (Friendship f : friendships) {
-                User user = getUserById(f.getUser2Id());
-                friends.add(user);
-            }
+    public User updateUser(User user) {
+        try {
+            UserValidator.validateUser(user);
+            return userStorage.updateUser(user);
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
-        return friends;
-    }
-
-    private ArrayList<Integer> getUserFriendsIds(int userId) {
-        ArrayList<Integer> friends = new ArrayList<>();
-        ArrayList<Friendship> friendships = new ArrayList<>(friendshipStorage.getUserFriendships(userId));
-        for (Friendship f : friendships) {
-            friends.add(f.getUser2Id());
-        }
-        return friends;
-    }
-
-    public User createUser(User user) throws ValidationException, ExistenceException {
-        return userStorage.createUser(user);
-    }
-
-    public User updateUser(User user) throws ValidationException, ExistenceException {
-        return userStorage.updateUser(user);
     }
 
     public Collection<User> getAllUsers() {
-        Collection<User> users = userStorage.getAllUsers().values();
-        for (User u : users) {
-            u.setFriends(getUserFriendsIds(u.getId()));
-        }
-        return users;
+        return userStorage.getAllUsers().values();
     }
 
-    public User getUserById(int userId) throws ValidationException, ExistenceException {
-        User user = userStorage.getUserById(userId);
-        user.setFriends(getUserFriendsIds(userId));
-        return user;
+    public User getUserById(int userId) {
+        return userStorage.getUserById(userId);
     }
 
-    public void removeUserById(int id) throws ValidationException {
+    public void removeUserById(int id) {
         if (id <= 0) {
             throw new ValidationException("id должен быть положительным");
         }

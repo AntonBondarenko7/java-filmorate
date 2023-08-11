@@ -21,19 +21,25 @@ public class Film {
     private int id;
     private String name;
     private String description;
-    private Set<Integer> likes;
-
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
     private int duration;
-    private Set<Genre> genres;
+    private final Set<Genre> genres = new LinkedHashSet<>();
+    private final Set<Review> reviews = new LinkedHashSet<>();
     private Set<Director> directors;
     private MpaRating mpa;
-    private final Set<Review> reviews = new LinkedHashSet<>();
+
+    public void addDirector(Director director) {
+        directors.add(director);
+    }
 
     public void addReview(Review review) {
         reviews.add(review);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 }
