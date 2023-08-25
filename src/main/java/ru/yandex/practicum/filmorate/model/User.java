@@ -7,8 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 
 @Data
@@ -23,5 +23,4 @@ public class User {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    private ArrayList<Integer> friends;
 }

@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -27,7 +27,7 @@ public class UserDbStorageTests {
     private final UserDbStorage userStorage;
 
     @BeforeEach
-    void setUp() throws ValidationException, ExistenceException {
+    void setUp() {
         User user = User.builder()
                 .email("test@example.com")
                 .login("testuser")
@@ -39,7 +39,7 @@ public class UserDbStorageTests {
     }
 
     @Test
-    public void testCreateUser() throws ValidationException, ExistenceException {
+    public void testCreateUser() {
         User user = User.builder()
                 .email("test1@example.com")
                 .login("testuser1")
@@ -56,7 +56,7 @@ public class UserDbStorageTests {
     }
 
     @Test
-    public void testUpdateUser() throws ValidationException, ExistenceException {
+    public void testUpdateUser() {
         int userId = userStorage.getAllUsers().keySet().stream().findFirst().get().intValue();
         User userToUpdate = User.builder()
                 .id(userId)
@@ -84,7 +84,7 @@ public class UserDbStorageTests {
     }
 
     @Test
-    public void testGetUserById() throws ExistenceException, ValidationException {
+    public void testGetUserById() {
         User user = User.builder()
                 .email("test2@example.com")
                 .login("testuser2")
@@ -106,7 +106,7 @@ public class UserDbStorageTests {
     @Test
     public void testDeleteUserById() {
         int userId = userStorage.getAllUsers().keySet().stream().findFirst().get().intValue();
-        userStorage.deleteUserById(userId);
+        userStorage.removeUserById(userId);
         assertThrows(ExistenceException.class, () -> userStorage.getUserById(userId));
     }
 }

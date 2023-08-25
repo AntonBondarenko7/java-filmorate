@@ -3,60 +3,83 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import java.util.Collection;
-import java.util.Objects;
+import ru.yandex.practicum.filmorate.validator.YearValidator;
 
-@Component
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import java.util.Collection;
+
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController extends AdviceController {
     private final FilmService filmService;
 
-    @GetMapping
-    public Collection<Film> getAllFilms() throws ExistenceException {
+    @GetMapping()
+    public Collection<Film> getAllFilms() {
         return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getFilmById(@PathVariable int id) throws ExistenceException, ValidationException {
-        return new ResponseEntity<>(filmService.getFilmById(id), HttpStatus.OK);
+    public Film getFilmById(@PathVariable int id) {
+        return filmService.getFilmById(id);
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<?> getMostPopularFilms(@RequestParam(required = false) Integer count) throws ExistenceException {
-        return new ResponseEntity<>(filmService.getMostPopularFilms(Objects.requireNonNullElse(count, 10)),
-                HttpStatus.OK);
+    public Collection<Film> getMostPopularFilms(
+            @RequestParam(value = "count", defaultValue = "10") @Positive Integer count,
+            @RequestParam(value = "genreId", defaultValue = "0") @Min(0) Integer genreId,
+            @RequestParam(value = "year", defaultValue = "0") @YearValidator Integer year
+    ) {
+        return filmService.getMostPopularFilms(count, genreId, year);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
-        return new ResponseEntity<>(filmService.createFilm(film), HttpStatus.CREATED);
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsDirectorSorted(@PathVariable Integer directorId, @RequestParam("sortBy") FilmSortBy sortBy) {
+        return filmService.getFilmsDirectorSorted(directorId, sortBy);
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateFilm(@RequestBody Film film) throws ValidationException, ExistenceException {
-        return new ResponseEntity<>(filmService.updateFilm(film), HttpStatus.OK);
+    @GetMapping("/common")
+    public Collection<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/search")
+    public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+        return filmService.searchFilms(query, by);
+    }
+
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public Film createFilm(@Valid @RequestBody Film film) {
+        return filmService.createFilm(film);
+    }
+
+    @PutMapping()
+    public Film updateFilm(@RequestBody Film film) {
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> addLike(@PathVariable int id,
-                                     @PathVariable int userId) throws ValidationException, ExistenceException {
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
         filmService.addLike(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> removeLike(@PathVariable int id,
-                                        @PathVariable int userId) throws ValidationException, ExistenceException {
+    public void removeLike(@PathVariable int id, @PathVariable int userId) {
         filmService.removeLike(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public void removeFilmById(@PathVariable int id) {
+        filmService.removeFilmById(id);
     }
 }

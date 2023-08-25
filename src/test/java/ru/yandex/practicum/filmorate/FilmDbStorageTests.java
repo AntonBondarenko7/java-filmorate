@@ -9,17 +9,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -34,7 +35,7 @@ public class FilmDbStorageTests {
     private final LikeStorage likeStorage;
 
     @BeforeEach
-    void setUp() throws ExistenceException, ValidationException {
+    void setUp() {
         Film film = Film.builder()
                 .name("Test film")
                 .description("Test description")
@@ -47,7 +48,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testCreateFilm() throws ValidationException, ExistenceException {
+    public void testCreateFilm() {
         Film film = Film.builder()
                 .name("Test film1")
                 .description("Test description1")
@@ -67,7 +68,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testUpdateFilm() throws ExistenceException, ValidationException {
+    public void testUpdateFilm() {
         int filmId = filmDbStorage.getAllFilms().keySet().stream().findFirst().get().intValue();
         Film film = Film.builder()
                 .id(filmId)
@@ -96,7 +97,7 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void testGetMostPopularFilms() throws ValidationException, ExistenceException {
+    public void testGetMostPopularFilms() {
         User user = User.builder()
                 .email("test@example.com")
                 .login("testuser")
@@ -116,13 +117,13 @@ public class FilmDbStorageTests {
 
         Film createdFilm = filmDbStorage.createFilm(film);
         likeStorage.createLike(createdUser.getId(), createdFilm.getId());
-        List<Film> popFilms = filmDbStorage.getMostPopularFilms(10);
+        List<Film> popFilms = filmDbStorage.getMostPopularFilms(10, 0, 0);
 
         assertEquals(createdFilm.getId(), popFilms.get(0).getId());
     }
 
     @Test
-    public void testGetFilmById() throws ExistenceException, ValidationException {
+    public void testGetFilmById() {
         Film film = Film.builder()
                 .name("Test film2")
                 .description("Test description2")
@@ -145,7 +146,7 @@ public class FilmDbStorageTests {
     @Test
     public void testDeleteFilmById() {
         int filmId = filmDbStorage.getAllFilms().keySet().stream().findFirst().get().intValue();
-        filmDbStorage.deleteFilmById(filmId);
+        filmDbStorage.removeFilmById(filmId);
         assertThrows(ExistenceException.class, () -> filmDbStorage.getFilmById(filmId));
     }
 }

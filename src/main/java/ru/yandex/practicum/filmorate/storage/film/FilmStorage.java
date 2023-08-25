@@ -1,33 +1,29 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmSortBy;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 public interface FilmStorage {
-    Film createFilm(Film film) throws ValidationException;
+    Film createFilm(Film film);
 
-    Film updateFilm(Film film) throws ValidationException, ExistenceException;
-
-    default int generateId() {
-        throw new UnsupportedOperationException("Метод не поддерживается");
-    }
+    Film updateFilm(Film film);
 
     HashMap<Integer, Film> getAllFilms();
 
-    default int getFilmLikesCount(Film film) {
-        throw new UnsupportedOperationException("Метод не поддерживается");
-    }
+    Film getFilmById(int filmId);
 
-    Film getFilmById(int filmId) throws ValidationException, ExistenceException;
+    List<Film> getMostPopularFilms(int count, int genreId, int year);
 
-    default List<Film> getMostPopularFilms(int count) throws ExistenceException {
-        throw new UnsupportedOperationException("Метод не поддерживается");
-    }
+    List<Film> getCommonFilms(int userId, int friendId);
 
-    default TreeSet<Film> getMostPopularFilms() {
-        throw new UnsupportedOperationException("Метод не поддерживается");
-    }
+    List<Film> getFilmsDirectorSorted(int directorId, FilmSortBy sortBy);
+
+    List<Film> getRecommendations(int userId);
+
+    void removeFilmById(int id);
+
+    List<Film> searchFilms(String query, String searchType);
 }

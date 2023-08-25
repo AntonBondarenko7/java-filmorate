@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
@@ -10,61 +10,55 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserValidatorTest {
-    private UserValidator userValidator;
-
-    @BeforeEach
-    void setUp() {
-        userValidator = new UserValidator();
-    }
 
     @Test
     void checkBirthdayValid() {
-        assertDoesNotThrow(() -> userValidator.checkBirthday(LocalDate.of(2000, 10, 28)));
+        assertDoesNotThrow(() -> UserValidator.checkBirthday(LocalDate.of(2000, 10, 28)));
     }
 
     @Test
     void checkBirthdayInTheFuture() {
         assertThrows(ValidationException.class,
-                () -> userValidator.checkBirthday(LocalDate.of(2100, 12, 27)));
+                () -> UserValidator.checkBirthday(LocalDate.of(2100, 12, 27)));
     }
 
     @Test
     void checkNameValid() {
-        assertFalse(userValidator.checkName("John Doe"));
+        assertFalse(UserValidator.checkName("John Doe"));
     }
 
     @Test
     void checkNameInvalid() {
-        assertTrue(userValidator.checkName(""));
+        assertTrue(UserValidator.checkName(""));
     }
 
     @Test
     void checkLoginValid() {
-        assertDoesNotThrow(() -> userValidator.checkLogin("validUsername"));
+        assertDoesNotThrow(() -> UserValidator.checkLogin("validUsername"));
     }
 
     @Test
     void checkLoginInvalidEmpty() {
-        assertThrows(ValidationException.class, () -> userValidator.checkLogin(""));
+        assertThrows(ValidationException.class, () -> UserValidator.checkLogin(""));
     }
 
     @Test
     void checkLoginInvalidWithSpace() {
-        assertThrows(ValidationException.class, () -> userValidator.checkLogin("invalid username"));
+        assertThrows(ValidationException.class, () -> UserValidator.checkLogin("invalid username"));
     }
 
     @Test
     void checkEmailValid() {
-        assertDoesNotThrow(() -> userValidator.checkEmail("valid@example.com"));
+        assertDoesNotThrow(() -> UserValidator.checkEmail("valid@example.com"));
     }
 
     @Test
     void checkEmailInvalidEmpty() {
-        assertThrows(ValidationException.class, () -> userValidator.checkEmail(""));
+        assertThrows(ValidationException.class, () -> UserValidator.checkEmail(""));
     }
 
     @Test
     void checkEmailInvalidNoAtSymbol() {
-        assertThrows(ValidationException.class, () -> userValidator.checkEmail("invalid.example.com"));
+        assertThrows(ValidationException.class, () -> UserValidator.checkEmail("invalid.example.com"));
     }
 }

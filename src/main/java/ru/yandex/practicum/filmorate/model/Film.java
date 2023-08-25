@@ -8,7 +8,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
+
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -19,13 +21,25 @@ public class Film {
     private int id;
     private String name;
     private String description;
-    private Set<Integer> likes;
-
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
     private int duration;
-    private Set<Genre> genres;
+    private final Set<Genre> genres = new LinkedHashSet<>();
+    private final Set<Review> reviews = new LinkedHashSet<>();
+    private Set<Director> directors;
     private MpaRating mpa;
+
+    public void addDirector(Director director) {
+        directors.add(director);
+    }
+
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
 }

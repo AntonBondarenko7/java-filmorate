@@ -8,16 +8,17 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
+import java.util.List;
+
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
@@ -28,12 +29,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class FilmGenreStorageTests {
     private final FilmDbStorage filmDbStorage;
     private final MpaRatingStorage mpaStorage;
-    private final FilmGenreStorage filmGenreStorage;
+    private final FilmGenreDBStorage filmGenreStorage;
     private final int genreId = 1;
     private int filmId;
 
     @BeforeEach
-    void setUp() throws ExistenceException, ValidationException {
+    void setUp() {
         Film film = Film.builder()
                 .name("Test film")
                 .description("Test description")
@@ -47,26 +48,26 @@ public class FilmGenreStorageTests {
     }
 
     @Test
-    public void testCreateFilmGenre() throws ExistenceException {
-        filmGenreStorage.createFilmGenre(filmId, genreId);
-        Set<Genre> filmGenres = filmGenreStorage.getFilmGenresByFilmId(filmId);
+    public void testCreateFilmGenre() {
+        filmGenreStorage.setFilmGenre(filmId, genreId);
+        List<Genre> filmGenres = filmGenreStorage.getFilmGenre(filmId);
         assertThat(filmGenres.size()).isEqualTo(1);
         Genre genre = filmGenres.iterator().next();
         assertThat(genre.getId()).isEqualTo(genreId);
     }
 
     @Test
-    public void testDeleteAllFilmGenresByFilmId() throws ExistenceException {
-        filmGenreStorage.createFilmGenre(filmId, genreId);
-        filmGenreStorage.deleteAllFilmGenresByFilmId(filmId);
-        Set<Genre> filmGenres = filmGenreStorage.getFilmGenresByFilmId(filmId);
+    public void testDeleteAllFilmGenresByFilmId() {
+        filmGenreStorage.setFilmGenre(filmId, genreId);
+        filmGenreStorage.deleteGenresOfFilm(filmId);
+        List<Genre> filmGenres = filmGenreStorage.getFilmGenre(filmId);
         assertThat(filmGenres.isEmpty()).isEqualTo(true);
     }
 
     @Test
-    public void testGetFilmGenresByFilmId() throws ExistenceException {
-        filmGenreStorage.createFilmGenre(filmId, genreId);
-        Set<Genre> filmGenres = filmGenreStorage.getFilmGenresByFilmId(filmId);
+    public void testGetFilmGenresByFilmId() {
+        filmGenreStorage.setFilmGenre(filmId, genreId);
+        List<Genre> filmGenres = filmGenreStorage.getFilmGenre(filmId);
 
         assertThat(filmGenres.size()).isEqualTo(1);
         assertThat(filmGenres.stream().findFirst().get().getId()).isEqualTo(genreId);

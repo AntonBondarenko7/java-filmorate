@@ -8,9 +8,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exception.ExistenceException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreDBStorage;
+
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @Rollback
 public class GenreStorageTests {
-    private final GenreStorage genreStorage;
+    private final FilmGenreDBStorage genreStorage;
 
     @BeforeEach
     void setUp() {
@@ -31,71 +32,77 @@ public class GenreStorageTests {
 
     @Test
     public void testCreateGenre() {
-        String genreName = "Test Genre";
-        genreStorage.createGenre(genreName);
+        String genreName = "Test genre";
+        Genre genre = new Genre();
+        genre.setName(genreName);
+        genreStorage.createGenre(genre);
 
-        List<Genre> genres = genreStorage.getAllGenres();
+        LinkedList<Genre> genres = new LinkedList<>();
+        genres.addAll(genreStorage.getAll());
 
         assertFalse(genres.isEmpty());
-        assertEquals(genreName, genres.get(0).getName());
+        assertEquals(genreName, genres.getLast().getName());
     }
 
     @Test
     public void testDeleteGenre() {
-        genreStorage.createGenre("Test Genre");
-        List<Genre> genres = genreStorage.getAllGenres();
+        String genreName = "Test genre";
+        Genre genre = new Genre();
+        genre.setName(genreName);
+        genreStorage.createGenre(genre);
+
+        List<Genre> genres = genreStorage.getAll();
         int genreId = genres.get(0).getId();
 
         genreStorage.deleteGenre(genreId);
-        genres = genreStorage.getAllGenres();
+        genres = genreStorage.getAll();
 
         assertTrue(genres.isEmpty());
     }
 
     @Test
     public void testDeleteAllGenres() {
-        genreStorage.createGenre("Test Genre");
+        genreStorage.createGenre(new Genre(1,"Test Genre"));
         genreStorage.deleteAllGenres();
-        List<Genre> genres = genreStorage.getAllGenres();
+        List<Genre> genres = genreStorage.getAll();
 
         assertTrue(genres.isEmpty());
     }
 
     @Test
     public void testGetAllGenres() {
-        genreStorage.createGenre("Test Genre");
-        genreStorage.createGenre("Test Genre2");
+        genreStorage.createGenre(new Genre(1,"Test Genre"));
+        genreStorage.createGenre(new Genre(2,"Test Genre2"));
 
-        List<Genre> genres = genreStorage.getAllGenres();
+        List<Genre> genres = genreStorage.getAll();
 
         assertEquals(2, genres.size());
     }
 
     @Test
-    public void testGetGenreById() throws ExistenceException {
+    public void testGetGenreById() {
         String genreName = "Test genre";
-        genreStorage.createGenre(genreName);
-        List<Genre> genres = genreStorage.getAllGenres();
+        genreStorage.createGenre(new Genre(1, genreName));
+        List<Genre> genres = genreStorage.getAll();
         int genreId = genres.get(0).getId();
 
-        Genre genre = genreStorage.getGenreById(genreId);
+        Genre genre = genreStorage.getById(genreId).get();
 
         assertThat(genre.getName()).isEqualTo(genreName);
     }
 
     @Test
-    public void testUpdateGenre() throws ExistenceException {
+    public void testUpdateGenre() {
         String updatedName = "Test genre updated";
-        genreStorage.createGenre("Test genre");
-        List<Genre> genres = genreStorage.getAllGenres();
+        genreStorage.createGenre(new Genre(1,"Test genre updated"));
+        List<Genre> genres = genreStorage.getAll();
         int genreId = genres.get(0).getId();
 
         Genre genreToUpdate = Genre.builder().id(genreId).name(updatedName).build();
 
         genreStorage.updateGenre(genreToUpdate);
 
-        Genre retrievedGenre = genreStorage.getGenreById(genreId);
-        assertThat(retrievedGenre.getName()).isEqualTo(updatedName);
+        Genre retrievedGenre = genreStorage.getById(genreId).get();
         assertThat(retrievedGenre.getName()).isEqualTo(updatedName);
     }
 }

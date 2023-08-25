@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Friendship;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,7 +20,7 @@ public class FriendshipStorage {
 
     public void createFriendship(int id, int friendId) {
         String sqlQuery = "INSERT INTO friendships (user1_id, user2_id, is_approved)" +
-                          "VALUES (?, ?, ?)";
+                "VALUES (?, ?, ?)";
         jdbcTemplate.update(sqlQuery, id, friendId, false);
     }
 
